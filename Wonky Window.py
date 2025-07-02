@@ -184,6 +184,28 @@ class Window:
 
         self.root.after(1, self.hide_sliders, scale-2)
 
+    def animate_settings_open(self, center_x, center_y, i=0):
+        if i < 400:
+            self.root.geometry('+{}+{}'.format(int(center_x - (int(100+i)) / 2), int(center_y - (int(100+i*.5) / 2))))
+            self.root.geometry(f'{int(100+i)}x{int(100+i*.5)}')
+            self.root.after(10, self.animate_settings_open, center_x, center_y, i+10)
+        else:
+            self.root.geometry(f'500x300')
+            self.root.update()
+            self.root.overrideredirect(True)
+            self.state = "settings"
+
+    def animate_settings_close(self, center_x, center_y, i=0):
+        if i < 400:
+            self.root.geometry('+{}+{}'.format(int(center_x - (int(500-i)) / 2), int(center_y - (int(300-i*.5) / 2))))
+            self.root.geometry(f'{int(500-i)}x{int(300-i*.5)}')
+            self.root.after(10, self.animate_settings_close, center_x, center_y, i+10)
+        else:
+            self.root.geometry(f'100x100')
+            self.root.update()
+            self.root.overrideredirect(True)
+            self.state = "loop"
+
     def on_settings(self, i=1):
         self.mouse_down(False)
         self.velX = 0
@@ -193,16 +215,8 @@ class Window:
             self.show_sliders()
             center_x = self.windowX + 50
             center_y = self.windowY + 50
+            self.animate_settings_open(center_x=center_x, center_y=center_y)
 
-            for i in range(400):
-                self.root.geometry('+{}+{}'.format(int(center_x - (int(100+i)) / 2), int(center_y - (int(100+i*.5) / 2))))
-                self.root.geometry(f'{int(100+i)}x{int(100+i*.5)}')
-                self.root.update()
-
-            self.root.geometry(f'500x300')
-            self.root.update()
-            self.root.overrideredirect(True)
-            self.state = "settings"
         elif self.state == "settings":
             self.state = "closing settings"
             self.hide_sliders()
@@ -210,16 +224,7 @@ class Window:
             self.windowY = (self.root.winfo_rooty() + self.root.winfo_height() // 2) - 50
             center_x = self.windowX + 50
             center_y = self.windowY + 50
-
-            for i in range(400):
-                self.root.geometry('+{}+{}'.format(int(center_x - (int(500-i)) / 2), int(center_y - (int(300-i*.5) / 2))))
-                self.root.geometry(f'{int(500-i)}x{int(300-i*.5)}')
-                self.root.update()
-
-            self.root.geometry(f'100x100')
-            self.root.update()
-            self.root.overrideredirect(True)
-            self.state = "loop"
+            self.animate_settings_close(center_x=center_x, center_y=center_y)
 
     def check_window_collision(self):
         if self.state == "loop":
