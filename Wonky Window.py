@@ -222,27 +222,28 @@ class Window:
             self.state = "loop"
 
     def check_window_collision(self):
-        if not self.mouseDown:
-            width = self.screen_width - self.root.winfo_width()
-            height = self.screen_height - self.root.winfo_height()
+        if self.state == "loop":
+            if not self.mouseDown:
+                width = self.screen_width - self.root.winfo_width()
+                height = self.screen_height - self.root.winfo_height()
 
-            if self.windowX < 0:
-                distance = round(self.windowX - 0) / POP_FACTOR
-                self.velX = (-self.velX * BOUNCE_FACTOR) + distance
-                self.windowX = 0
-            elif self.windowX > width:
-                distance = round(self.windowX - width) / POP_FACTOR
-                self.velX = (-self.velX * BOUNCE_FACTOR) + distance
-                self.windowX = width
+                if self.windowX < 0:
+                    distance = round(self.windowX - 0) / POP_FACTOR
+                    self.velX = (-self.velX * BOUNCE_FACTOR) + distance
+                    self.windowX = 0
+                elif self.windowX > width:
+                    distance = round(self.windowX - width) / POP_FACTOR
+                    self.velX = (-self.velX * BOUNCE_FACTOR) + distance
+                    self.windowX = width
 
-            if self.windowY > height:
-                distance = round(self.windowY - height) / POP_FACTOR
-                self.velY = (-self.velY * BOUNCE_FACTOR) + distance
-                self.windowY = height
-            elif self.windowY < 38:
-                distance = round(self.windowY - 38) / POP_FACTOR
-                self.velY = (-self.velY * BOUNCE_FACTOR) + distance
-                self.windowY = 38
+                if self.windowY > height:
+                    distance = round(self.windowY - height) / POP_FACTOR
+                    self.velY = (-self.velY * BOUNCE_FACTOR) + distance
+                    self.windowY = height
+                elif self.windowY < 38:
+                    distance = round(self.windowY - 38) / POP_FACTOR
+                    self.velY = (-self.velY * BOUNCE_FACTOR) + distance
+                    self.windowY = 38
 
     def loop(self):
         if self.state == "loop":
