@@ -1,3 +1,0 @@
-([('Wonky Window',
-   '/Users/maxpersonal/Developer/test window thing/dist/Wonky Window',
-   'EXECUTABLE')],)
