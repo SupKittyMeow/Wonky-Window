@@ -8,13 +8,13 @@ THROW_FACTOR = 200
 POP_FACTOR = 2
 
 root = tkinter.Tk()
-root.overrideredirect(True)
 root.attributes('-topmost', True)
 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
 root.attributes('-alpha', 0.8)
+root.update_idletasks()
 root.geometry("{}x{}".format(1, 1))
 root.resizable(False, False)
 
@@ -134,11 +134,12 @@ def Loop():
 def animate_grow(i=1):
     if i <= 50:
         center_x = root.winfo_pointerx() + 50
-        cetner_y = root.winfo_pointery() + 50
-        
-        root.geometry('+{}+{}'.format(int(center_x - i - 50), int(cetner_y - i - 50)))
-        root.overrideredirect(True)
+        center_y = root.winfo_pointery() + 50
+        root.geometry('+{}+{}'.format(int(center_x - i - 50), int(center_y - i - 50)))
         root.geometry(f"{i*2}x{i*2}")
+
+        root.overrideredirect(True)
+        
         root.after(10, animate_grow, i+1)
     else:
         global windowX, windowY
