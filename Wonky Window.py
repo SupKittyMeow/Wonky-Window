@@ -7,145 +7,140 @@ FRICTION = 1.0125
 THROW_FACTOR = 200
 POP_FACTOR = 2
 
-root = tkinter.Tk()
-root.attributes('-topmost', True)
+class Window:
+    def __init__(self):
+        self.root = tkinter.Tk()
+        self.root.attributes('-topmost', True)
+            
+        self.screen_width = self.root.winfo_screenwidth()
+        self.screen_height = self.root.winfo_screenheight()
 
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
+        self.root.attributes('-alpha', 0.8)
+        self.root.update_idletasks()
+        self.root.geometry("{}x{}".format(1, 1))
+        self.root.resizable(False, False)
 
-root.attributes('-alpha', 0.8)
-root.update_idletasks()
-root.geometry("{}x{}".format(1, 1))
-root.resizable(False, False)
+        self.windowX = self.root.winfo_pointerx() - 50
+        self.windowY = self.root.winfo_pointery() - 50
+        self.mouseDown = False
 
-windowX = root.winfo_pointerx() - 50
-windowY = root.winfo_pointery() - 50
-mouseDown = False
+        self.root.bind("<ButtonPress-1>", lambda event: self.MouseDown(True))
+        self.root.bind("<ButtonRelease-1>", lambda event: self.MouseDown(False))
+        self.root.bind('<Motion>', lambda event: self.Motion())
+        self.velX = 0
+        self.velY = 0
 
-root.bind("<ButtonPress-1>", lambda event: MouseDown(True))
-root.bind("<ButtonRelease-1>", lambda event: MouseDown(False))
-root.bind('<Motion>', lambda event: Motion())
+        self.offsetX = 0
+        self.offsetY = 0
 
-velX = 0
-velY = 0
+        self.previousFramesX = [0, 0, 0, 0, 0, 0]
+        self.previousFramesY = [0, 0, 0, 0, 0, 0]
+        self.previousTimestamps = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-offsetX = 0
-offsetY = 0
-
-previousFramesX = [0, 0, 0, 0, 0, 0]
-previousFramesY = [0, 0, 0, 0, 0, 0]
-previousTimestamps = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-
-def MouseDown(down):
-    global mouseDown, offsetX, offsetY, previousFramesX, previousFramesY, velX, velY
-
-    if mouseDown == False and down == True:
-        velX = 0
-        velY = 0
-        previousFramesX = [0, 0, 0, 0, 0, 0]
-        previousFramesY = [0, 0, 0, 0, 0, 0]
-    mouseDown = down
-    offsetX = root.winfo_rootx() - root.winfo_pointerx()
-    offsetY = root.winfo_rooty() - root.winfo_pointery()
-
-    if not down:
-        distancesX = []
-        distancesY = []
+        self.animate_grow()
+        self.root.mainloop()
         
-        i = 0
-        for frame in previousFramesX:
-            if i == 0:
+    def MouseDown(self, down):
+        if self.mouseDown == False and down == True:
+            self.velX = 0
+            self.velY = 0
+            self.previousFramesX = [0, 0, 0, 0, 0, 0]
+            self.previousFramesY = [0, 0, 0, 0, 0, 0]
+        self.mouseDown = down
+        self.offsetX = self.root.winfo_rootx() - self.root.winfo_pointerx()
+        self.offsetY = self.root.winfo_rooty() - self.root.winfo_pointery()
+
+        if not down:
+            distancesX = []
+            distancesY = []
+            
+            i = 0
+            for frame in self.previousFramesX:
+                if i == 0:
+                    i += 1
+                    continue
+
+                try:
+                    distancesX.append((self.previousFramesX[i] - self.previousFramesX[i-1]) / (self.previousTimestamps[i] - self.previousTimestamps[i-1]))
+                except Exception:
+                    distancesX.append(0)
                 i += 1
-                continue
-
-            try:
-                distancesX.append((previousFramesX[i] - previousFramesX[i-1]) / (previousTimestamps[i] - previousTimestamps[i-1]))
-            except Exception:
-                distancesX.append(0)
-            i += 1
-        i = 0
-        for frame in previousFramesY:
-            if i == 0:
+            i = 0
+            for frame in self.previousFramesY:
+                if i == 0:
+                    i += 1
+                    continue
+                try:
+                    distancesY.append((self.previousFramesY[i] - self.previousFramesY[i-1]) / (self.previousTimestamps[i] - self.previousTimestamps[i-1]))
+                except Exception:
+                    distancesY.append(0)
                 i += 1
-                continue
-            try:
-                distancesY.append((previousFramesY[i] - previousFramesY[i-1]) / (previousTimestamps[i] - previousTimestamps[i-1]))
-            except Exception:
-                distancesY.append(0)
-            i += 1
 
-        velX = sum(distancesX) / len(distancesX) / THROW_FACTOR
-        velY = sum(distancesY) / len(distancesY) / THROW_FACTOR
+            self.velX = sum(distancesX) / len(distancesX) / THROW_FACTOR
+            self.velY = sum(distancesY) / len(distancesY) / THROW_FACTOR
 
-def Motion():
-    if (mouseDown):
-        global velX, velY, offsetX, offsetY, windowX, windowY, previousFramesX, previousFramesY
-        previousFramesX.append(root.winfo_pointerx())
-        previousFramesY.append(root.winfo_pointery())
-        previousTimestamps.append(time.time())
-        previousFramesX.pop(0)
-        previousFramesY.pop(0)
-        previousTimestamps.pop(0)
-        windowX = root.winfo_pointerx() + offsetX
-        windowY = root.winfo_pointery() + offsetY
-        CheckWindowStuff()
-        root.geometry('+{}+{}'.format(root.winfo_pointerx() + offsetX, root.winfo_pointery() + offsetY))
-        root.overrideredirect(True)
+    def Motion(self):
+        if (self.mouseDown):
+            self.previousFramesX.append(self.root.winfo_pointerx())
+            self.previousFramesY.append(self.root.winfo_pointery())
+            self.previousTimestamps.append(time.time())
+            self.previousFramesX.pop(0)
+            self.previousFramesY.pop(0)
+            self.previousTimestamps.pop(0)
+            self.windowX = self.root.winfo_pointerx() + self.offsetX
+            self.windowY = self.root.winfo_pointery() + self.offsetY
+            self.CheckWindowStuff()
+            self.root.geometry('+{}+{}'.format(self.root.winfo_pointerx() + self.offsetX, self.root.winfo_pointery() + self.offsetY))
+            self.root.overrideredirect(True)
 
-def CheckWindowStuff():
-    if not mouseDown:
-        global windowX, windowY, velX, velY
+    def CheckWindowStuff(self):
+        if not self.mouseDown:
+            width = self.screen_width - self.root.winfo_width()
+            height = self.screen_height - self.root.winfo_height()
 
-        width = screen_width - root.winfo_width()
-        height = screen_height - root.winfo_height()
+            if self.windowX < 0:
+                distance = round(self.windowX - 0) / POP_FACTOR
+                self.velX = (-self.velX * BOUNCE_FACTOR) + distance
+                self.windowX = 0
+            elif self.windowX > width:
+                distance = round(self.windowX - width) / POP_FACTOR
+                self.velX = (-self.velX * BOUNCE_FACTOR) + distance
+                self.windowX = width
 
-        if windowX < 0:
-            distance = round(windowX - 0) / POP_FACTOR
-            velX = (-velX * BOUNCE_FACTOR) + distance
-            windowX = 0
-        elif windowX > width:
-            distance = round(windowX - width) / POP_FACTOR
-            velX = (-velX * BOUNCE_FACTOR) + distance
-            windowX = width
+            if self.windowY > height:
+                distance = round(self.windowY - height) / POP_FACTOR
+                self.velY = (-self.velY * BOUNCE_FACTOR) + distance
+                self.windowY = height
+            elif self.windowY < 38:
+                distance = round(self.windowY - 38) / POP_FACTOR
+                self.velY = (-self.velY * BOUNCE_FACTOR) + distance
+                self.windowY = 38
 
-        if windowY > height:
-            distance = round(windowY - height) / POP_FACTOR
-            velY = (-velY * BOUNCE_FACTOR) + distance
-            windowY = height
-        elif windowY < 38:
-            distance = round(windowY - 38) / POP_FACTOR
-            velY = (-velY * BOUNCE_FACTOR) + distance
-            windowY = 38
+    def Loop(self):
+        if not self.mouseDown:
+            self.windowX += self.velX
+            self.windowY += self.velY
+            self.CheckWindowStuff()
+            self.root.geometry('+{}+{}'.format(int(self.windowX), int(self.windowY)))
+            self.root.overrideredirect(True)
+            self.velY += GRAVITY
+            self.velX /= FRICTION
 
-def Loop():
-    global windowX, windowY, velX, velY
+        self.root.after(8, self.Loop)
 
-    if not mouseDown:
-        windowX += velX
-        windowY += velY
-        CheckWindowStuff()
-        root.geometry('+{}+{}'.format(int(windowX), int(windowY)))
-        root.overrideredirect(True)
-        velY += GRAVITY
-        velX /= FRICTION
+    def animate_grow(self, i=1):
+        if i <= 50:
+            center_x = self.root.winfo_pointerx() + 50
+            center_y = self.root.winfo_pointery() + 50
+            self.root.geometry('+{}+{}'.format(int(center_x - i - 50), int(center_y - i - 50)))
+            self.root.geometry(f"{i*2}x{i*2}")
 
-    root.after(8, Loop)
+            self.root.overrideredirect(True)
+            
+            self.root.after(10, self.animate_grow, i+1)
+        else:
+            self.windowX = self.root.winfo_x()
+            self.windowY = self.root.winfo_y()
+            self.Loop()
 
-def animate_grow(i=1):
-    if i <= 50:
-        center_x = root.winfo_pointerx() + 50
-        center_y = root.winfo_pointery() + 50
-        root.geometry('+{}+{}'.format(int(center_x - i - 50), int(center_y - i - 50)))
-        root.geometry(f"{i*2}x{i*2}")
-
-        root.overrideredirect(True)
-        
-        root.after(10, animate_grow, i+1)
-    else:
-        global windowX, windowY
-        windowX = root.winfo_x()
-        windowY = root.winfo_y()
-        Loop()
-
-animate_grow()
-root.mainloop()
+window = Window()
