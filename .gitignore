@@ -2,4 +2,3 @@ dist/*
 build/*
 Wonky Window.spec
 .DS_Store
-*.spec
