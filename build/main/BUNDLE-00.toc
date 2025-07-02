@@ -1,0 +1,3 @@
+([('main',
+   '/Users/maxpersonal/Developer/test window thing/dist/main',
+   'EXECUTABLE')],)
