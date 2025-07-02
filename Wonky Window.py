@@ -57,6 +57,11 @@ class Window:
         self.root.mainloop()
 
     def mouse_down(self, down):
+        if hasattr(self, 'gravity') or hasattr(self, 'bounciness') or hasattr(self, 'friction'):
+            widget_under_mouse = self.root.winfo_containing(self.root.winfo_pointerx(), self.root.winfo_pointery())
+            if widget_under_mouse == self.gravity or widget_under_mouse == self.bounciness or widget_under_mouse == self.friction:
+                self.hasBeenUnderMousePreviousFrame = True
+                
         if self.mouseDown == False and down == True:
             self.velX = 0
             self.velY = 0
@@ -98,10 +103,6 @@ class Window:
     def motion(self):
         if self.mouseDown == False:
             self.hasBeenUnderMousePreviousFrame = False
-        if hasattr(self, 'gravity') or hasattr(self, 'bounciness') or hasattr(self, 'friction'):
-            widget_under_mouse = self.root.winfo_containing(self.root.winfo_pointerx(), self.root.winfo_pointery())
-            if widget_under_mouse == self.gravity or widget_under_mouse == self.bounciness or widget_under_mouse == self.friction:
-                self.hasBeenUnderMousePreviousFrame = True
         if (self.mouseDown and not self.hasBeenUnderMousePreviousFrame):
             self.previousFramesX.append(self.root.winfo_pointerx())
             self.previousFramesY.append(self.root.winfo_pointery())
