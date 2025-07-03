@@ -283,7 +283,7 @@ class Window:
             self.windowX = self.root.winfo_x()
             self.windowY = self.root.winfo_y()
             self.state = "loop"
-            self.root.overrideredirect(False)
+            # self.root.overrideredirect(False)
             self.loop()
 
 window = Window()
