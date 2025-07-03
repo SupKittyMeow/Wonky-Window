@@ -12,7 +12,7 @@ POP_FACTOR = 2
 class Window:
     def __init__(self):
         self.root = tk.Tk()
-
+        self.root.overrideredirect(True)
         self.root.lift()
         self.root.attributes('-topmost', True)
             
@@ -63,7 +63,6 @@ class Window:
         self.previousFramesY = [0, 0, 0, 0, 0, 0]
         self.previousTimestamps = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-        self.root.overrideredirect(True)
         self.root.lift()
         self.state = "growing"
         self.animate_grow()
