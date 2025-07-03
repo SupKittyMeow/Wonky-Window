@@ -1,0 +1,53 @@
+name: Build apps
+
+on:
+  push:
+
+jobs:
+    build-macos:
+        runs-on: macos-latest
+        steps:
+        - uses: actions/checkout@v3
+        - uses: actions/setup-python@v4
+          with:
+            python-version: '3.13'
+        - run: pip install -r requirements-dev.txt
+        - name: Build for MacOS
+          run: pyinstaller --onefile --windowed "Wonky Window.py"
+        - name: Hide from dock
+          run: python3 hide_from_dock.py
+        - name: Upload MacOS Artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: WonkyWindow-macos
+            path: dist/Wonky Window*
+    build-windows:
+        runs-on: windows-latest
+        steps:
+        - uses: actions/checkout@v3
+        - uses: actions/setup-python@v4
+          with:
+            python-version: '3.13'
+        - run: pip install -r requirements-dev.txt
+        - name: Build for Windows
+          run: pyinstaller --onefile --windowed "Wonky Window.py"
+        - name: Upload Windows Artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: WonkyWindow-windows
+            path: dist/Wonky Window*
+    build-linux:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v3
+        - uses: actions/setup-python@v4
+          with:
+            python-version: '3.13'
+        - run: pip install -r requirements-dev.txt
+        - name: Build for Linux (untested)
+          run: pyinstaller --onefile --windowed "Wonky Window.py"
+        - name: Upload Linux Artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: WonkyWindow-linux
+            path: dist/Wonky Window*
