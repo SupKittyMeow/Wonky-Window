@@ -18,10 +18,15 @@ jobs:
           run: python3 hide_from_dock.py
         - name: Create dmg file
           run: mkdir -p "dist/dmg_staging" && cp -R "dist/Wonky Window.app" "dist/dmg_staging/" && ln -s /Applications "dist/dmg_staging/Applications" && hdiutil create -volname "Wonky Window" -srcfolder "dist/dmg_staging" -ov -format UDZO "Wonky Window.dmg"
-        - name: Upload MacOS Artifact
+        - name: Upload MacOS Artifact (DMG)
           uses: actions/upload-artifact@v4
           with:
             name: WonkyWindow-macos
+            path: dist/Wonky Window/dist/Wonky Window.dmg
+        - name: Upload MacOS Artifact (.app file)
+          uses: actions/upload-artifact@v4
+          with:
+            name: WonkyWindow-macos-folder
             path: dist/Wonky Window*
     build-windows:
         runs-on: windows-latest
