@@ -38,11 +38,11 @@ jobs:
           env:
             SIGN_ID: ${{ secrets.CODE_SIGN_IDENTITY }}
           run: |
-            codesign --force --deep --options runtime \
-              --entitlements entitlements.plist \
-              --timestamp \
-              --sign "$SIGN_ID" \
-              "dist/Wonky Window.app"
+            codesign --force --deep \
+                --entitlements entitlements.plist \
+                --timestamp \
+                --sign "$SIGN_ID" \
+                "dist/Wonky Window.app"
 
         - name: Notarise & staple
           env:
@@ -75,7 +75,7 @@ jobs:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v4
           with:
-            python-version: '3.13'
+            python-version: '3.13.5'
         - name: Cache pip
           uses: actions/cache@v4
           with:
@@ -97,7 +97,7 @@ jobs:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v4
           with:
-            python-version: '3.13'
+            python-version: '3.13.5'
         - name: Cache pip
           uses: actions/cache@v4
           with:
