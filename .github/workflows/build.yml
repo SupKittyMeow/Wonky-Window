@@ -20,7 +20,7 @@ jobs:
               ${{ runner.os }}-pip-
         - run: pip install -r requirements-dev.txt
         - name: Build for MacOS
-          run: pyinstaller --onedir --windowed --name "Wonky Window" --osx-bundle-identifier com.supkittymeow.wonkywindow --target-arch arm64 "Wonky Window.py"
+          run: pyinstaller --onedir --windowed --name "Wonky Window" --osx-bundle-identifier com.supkittymeow.wonkywindow --add-data "Info.plist:." "Wonky Window.py"
         # - name: Hide from dock
         #   run: python3 hide_from_dock.py
         - name: Import Developer-ID cert
