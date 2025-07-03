@@ -28,7 +28,6 @@ jobs:
           env:
             CERT_B64: ${{ secrets.MAC_CERT_P12_BASE64 }}
             CERT_PASS: ${{ secrets.MAC_CERT_PASSWORD }}
-            CODE_SIGN_IDENTITY: ${{ secrets.CODE_SIGN_IDENTITY }}
           run: |
             echo "$CERT_B64" | base64 --decode > /tmp/cert.p12
             security create-keychain -p "" build.keychain
@@ -37,6 +36,8 @@ jobs:
             security import /tmp/cert.p12 -k build.keychain -P "$CERT_PASS" -T /usr/bin/codesign
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" build.keychain
         - name: Codesign app
+          env:
+            SIGN_ID: ${{ secrets.CODE_SIGN_IDENTITY }}
           run: |
             codesign --force --deep --options runtime \
               --entitlements entitlements.plist \
