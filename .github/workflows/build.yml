@@ -21,8 +21,8 @@ jobs:
         - run: pip install -r requirements-dev.txt
         - name: Build for MacOS
           run: pyinstaller --onedir --windowed --name "Wonky Window" --osx-bundle-identifier com.max.wonkywindow "Wonky Window.py"
-        - name: Hide from dock
-          run: python3 hide_from_dock.py
+        # - name: Hide from dock
+        #   run: python3 hide_from_dock.py
 
         - name: Import Developer-ID cert
           env:
