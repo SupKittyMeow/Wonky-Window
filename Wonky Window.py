@@ -18,7 +18,7 @@ class Window:
 
         self.hasBeenUnderMousePreviousFrame = False
 
-        self.root.attributes('-alpha', 0.8)
+        self.root.attributes('-alpha', 0.7)
         self.root.update_idletasks()
         self.root.geometry('{}x{}'.format(1, 1))
         self.root.resizable(False, False)
