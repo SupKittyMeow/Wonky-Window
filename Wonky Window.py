@@ -11,13 +11,8 @@ POP_FACTOR = 2
 
 class Window:
     def __init__(self):
-            
         self.root = tk.Tk()
 
-        self.root.overrideredirect(False)
-        if sys.platform == "darwin":
-            self.root.tk.call("tk::unsupported::MacWindowStyle",
-                            "style", str(self.root), "help", "none")
         self.root.lift()
         self.root.attributes('-topmost', True)
             
@@ -69,6 +64,7 @@ class Window:
         self.previousTimestamps = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
         self.root.overrideredirect(True)
+        self.root.lift()
         self.state = "growing"
         self.animate_grow()
         self.root.mainloop()
@@ -131,7 +127,6 @@ class Window:
             self.windowY = self.root.winfo_pointery() + self.offsetY
             self.check_window_collision()
             self.root.geometry('+{}+{}'.format(self.root.winfo_pointerx() + self.offsetX, self.root.winfo_pointery() + self.offsetY))
-            self.root.overrideredirect(True)
     
     def on_gravity_change(self, value):
         global GRAVITY
@@ -210,7 +205,6 @@ class Window:
         else:
             self.root.geometry(f'500x300')
             self.root.update()
-            self.root.overrideredirect(True)
             self.state = "settings"
 
     def animate_settings_close(self, center_x, center_y, i=0):
@@ -221,7 +215,6 @@ class Window:
         else:
             self.root.geometry(f'100x100')
             self.root.update()
-            self.root.overrideredirect(True)
             self.state = "loop"
 
     def on_settings(self, i=1):
@@ -275,7 +268,6 @@ class Window:
                 self.windowY += self.velY
                 self.check_window_collision()
                 self.root.geometry('+{}+{}'.format(int(self.windowX), int(self.windowY)))
-                self.root.overrideredirect(True)
                 self.velY += GRAVITY
                 self.velX /= FRICTION
 
@@ -287,8 +279,6 @@ class Window:
             center_y = self.root.winfo_pointery()
             self.root.geometry('+{}+{}'.format(int(center_x - i), int(center_y - i)))
             self.root.geometry(f'{i*2}x{i*2}')
-
-            self.root.overrideredirect(True)
             
             self.root.after(10, self.animate_grow, i+1)
         else:
