@@ -20,7 +20,7 @@ jobs:
               ${{ runner.os }}-pip-
         - run: pip install -r requirements-dev.txt
         - name: Build for MacOS
-          run: pyinstaller --onefile --windowed "Wonky Window.py"
+          run: pyinstaller --onedir --windowed "Wonky Window.py"
         - name: Hide from dock
           run: python3 hide_from_dock.py
         - name: Create dmg file
