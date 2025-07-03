@@ -275,7 +275,7 @@ class Window:
                 self.root.overrideredirect(True)
                 self.velY += GRAVITY
                 self.velX /= FRICTION
-
+                self.root.lift()
         self.root.after(8, self.loop)
 
     def animate_grow(self, i=1):
@@ -285,11 +285,13 @@ class Window:
             self.root.geometry('+{}+{}'.format(int(center_x - i), int(center_y - i)))
             self.root.geometry(f'{i*2}x{i*2}')
             self.root.overrideredirect(True)
+            self.root.lift()
             
             self.root.after(10, self.animate_grow, i+1)
         else:
             self.windowX = self.root.winfo_x()
             self.windowY = self.root.winfo_y()
+            self.root.lift()
             self.state = "loop"
             self.loop()
 

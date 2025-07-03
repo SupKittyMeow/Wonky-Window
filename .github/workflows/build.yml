@@ -23,7 +23,6 @@ jobs:
           run: pyinstaller --onedir --windowed --name "Wonky Window" --osx-bundle-identifier com.supkittymeow.wonkywindow --target-arch universal2 "Wonky Window.py"
         # - name: Hide from dock
         #   run: python3 hide_from_dock.py
-
         - name: Import Developer-ID cert
           env:
             CERT_B64: ${{ secrets.MAC_CERT_P12_BASE64 }}
