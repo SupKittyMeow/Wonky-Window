@@ -12,6 +12,8 @@ POP_FACTOR = 2
 class Window:
     def __init__(self):
         self.root = tk.Tk()
+        
+        self.root.lift()
         self.root.attributes('-topmost', True)
             
         self.screen_width = self.root.winfo_screenwidth()
