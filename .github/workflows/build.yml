@@ -22,7 +22,7 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: WonkyWindow-macos
-            path: dist/Wonky Window/dist/Wonky Window.dmg
+            path: dist/Wonky Window.dmg
         - name: Upload MacOS Artifact (.app file)
           uses: actions/upload-artifact@v4
           with:
