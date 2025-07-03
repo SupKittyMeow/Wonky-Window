@@ -10,7 +10,7 @@ jobs:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v4
           with:
-            python-version: '3.13'
+            python-version: '3.13.5'
         - name: Cache pip
           uses: actions/cache@v4
           with:
@@ -20,9 +20,14 @@ jobs:
               ${{ runner.os }}-pip-
         - run: pip install -r requirements-dev.txt
         - name: Build for MacOS
-          run: pyinstaller --onedir --windowed "Wonky Window.py"
+          run: pyinstaller --onedir --windowed --name "Wonky Window" --osx-bundle-identifier com.max.wonkywindow "Wonky Window.py"
         - name: Hide from dock
           run: python3 hide_from_dock.py
+        - name: Remove quarantine & codesign
+          run: |
+            xattr -cr "dist/Wonky Window.app"
+            codesign --force --deep --sign - "dist/Wonky Window.app"
+
         - name: Create dmg file
           run: mkdir -p "dist/dmg_staging" && cp -R "dist/Wonky Window.app" "dist/dmg_staging/" && ln -s /Applications "dist/dmg_staging/Applications" && hdiutil create -volname "Wonky Window" -srcfolder "dist/dmg_staging" -ov -format UDZO "dist/Wonky Window.dmg"
         - name: Upload MacOS Artifact (DMG)
