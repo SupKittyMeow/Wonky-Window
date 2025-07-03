@@ -28,6 +28,7 @@ jobs:
           env:
             CERT_B64: ${{ secrets.MAC_CERT_P12_BASE64 }}
             CERT_PASS: ${{ secrets.MAC_CERT_PASSWORD }}
+            CODE_SIGN_IDENTITY: ${{ secrets.CODE_SIGN_IDENTITY }}
           run: |
             echo "$CERT_B64" | base64 --decode > /tmp/cert.p12
             security create-keychain -p "" build.keychain
@@ -40,7 +41,7 @@ jobs:
             codesign --force --deep --options runtime \
               --entitlements entitlements.plist \
               --timestamp \
-              --sign "Developer ID Application: Your Name (TEAMID)" \
+              --sign "$SIGN_ID" \
               "dist/Wonky Window.app"
 
         - name: Notarise & staple
