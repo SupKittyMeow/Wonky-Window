@@ -11,7 +11,13 @@ POP_FACTOR = 2
 
 class Window:
     def __init__(self):
+            
         self.root = tk.Tk()
+
+        self.root.overrideredirect(False)
+        if sys.platform == "darwin":
+            self.root.tk.call("tk::unsupported::MacWindowStyle",
+                            "style", str(self.root), "help", "none")
         self.root.lift()
         self.root.attributes('-topmost', True)
             
@@ -62,6 +68,7 @@ class Window:
         self.previousFramesY = [0, 0, 0, 0, 0, 0]
         self.previousTimestamps = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
+        self.root.overrideredirect(True)
         self.state = "growing"
         self.animate_grow()
         self.root.mainloop()
