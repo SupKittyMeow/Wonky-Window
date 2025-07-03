@@ -1,4 +1,5 @@
-import tkinter
+import sys
+import tkinter as tk
 import tkinter.ttk as ttk
 import time
 
@@ -10,7 +11,7 @@ POP_FACTOR = 2
 
 class Window:
     def __init__(self):
-        self.root = tkinter.Tk()
+        self.root = tk.Tk()
         self.root.attributes('-topmost', True)
             
         self.screen_width = self.root.winfo_screenwidth()
@@ -25,11 +26,19 @@ class Window:
 
         self.root.title("Wonky Window")
         
-        self.menubar = tkinter.Menu(self.root)
-        self.filemenu = tkinter.Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Settings", command=self.on_settings)
-        self.menubar.add_cascade(label="File", menu=self.filemenu)
-        self.root.config(menu=self.menubar)
+        if sys.platform == "darwin": # macos
+            self.root.createcommand(
+                'tk::mac::ShowPreferences',
+                self.on_settings
+            )
+            self.root['menu'] = tk.Menu(self.root)
+        else:
+            menubar = tk.Menu(self.root)
+            settings_menu = tk.Menu(menubar, tearoff=0)
+            settings_menu.add_command(label="Settings", command=self.on_settings,
+                                      accelerator="Ctrl+,")
+            menubar.add_cascade(label="Settings", menu=settings_menu)
+            self.root['menu'] = menubar
 
         self.windowX = self.root.winfo_pointerx() - 50
         self.windowY = self.root.winfo_pointery() - 50
@@ -142,19 +151,19 @@ class Window:
         self.gravity = ttk.Scale(self.root, from_=0, to=2, orient='horizontal', length=300, command=self.on_gravity_change)
         self.gravity.set(GRAVITY)
         self.gravity.pack(expand=True, pady=(25, 0))
-        self.gravity_label = tkinter.Label(self.root, text="Gravity")
+        self.gravity_label = tk.Label(self.root, text="Gravity")
         self.gravity_label.pack(pady=(0, 50))  
 
         self.bounciness = ttk.Scale(self.root, from_=0, to=1, orient='horizontal', length=300, command=self.on_bounciness_change)
         self.bounciness.set(BOUNCE_FACTOR)
         self.bounciness.pack(expand=True)
-        self.bounciness_label = tkinter.Label(self.root, text="Bounciness")
+        self.bounciness_label = tk.Label(self.root, text="Bounciness")
         self.bounciness_label.pack(pady=(0, 50))
 
         self.friction = ttk.Scale(self.root, from_=1, to=1.2, orient='horizontal', length=300, command=self.on_friction_change)
         self.friction.set(FRICTION)
         self.friction.pack(expand=True)
-        self.friction_label = tkinter.Label(self.root, text="Friction")
+        self.friction_label = tk.Label(self.root, text="Friction")
         self.friction_label.pack(pady=(0, 25))
 
         self.slide_in_effect()
