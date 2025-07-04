@@ -13,13 +13,12 @@ class Window:
     def __init__(self):
         self.root = tk.Tk()
 
-        # self.root.overrideredirect(True)
-        self.root.wm_attributes("-topmost", "true")
-
-        self.root.withdraw()
+        # self.root.withdraw()
+        self.root.overrideredirect(True)
         self.root.lift()
-        
-        self.root.attributes('-alpha', 0.8)
+        self.root.attributes('-topmost', True)
+
+        self.root.attributes('-alpha', 0.8)        
 
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
@@ -66,7 +65,7 @@ class Window:
         self.previousFramesY = [0, 0, 0, 0, 0, 0]
         self.previousTimestamps = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-        self.root.deiconify()
+        # self.root.deiconify()
 
         self.state = "growing"
         self.animate_grow()
@@ -273,7 +272,6 @@ class Window:
                 self.root.geometry('+{}+{}'.format(int(self.windowX), int(self.windowY)))
                 self.velY += GRAVITY
                 self.velX /= FRICTION
-        self.root.deiconify()
         self.root.after(8, self.loop)
 
     def animate_grow(self, i=1):
