@@ -12,16 +12,18 @@ POP_FACTOR = 2
 class Window:
     def __init__(self):
         self.root = tk.Tk()
+        # self.root.withdraw()    
+
         self.root.lift()
-            
+        self.root.wm_attributes("-topmost", "true")
+        self.root.attributes('-alpha', 0.8)
+        self.root.iconify()
+        
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
 
         self.hasBeenUnderMousePreviousFrame = False
 
-        self.root.wm_attributes("-topmost", "true")
-        self.root.attributes('-alpha', 0.8)
-        self.root.update_idletasks()
         self.root.geometry('{}x{}'.format(1, 1))
         self.root.resizable(False, False)
 
@@ -65,8 +67,6 @@ class Window:
         self.state = "growing"
         self.animate_grow()
         self.root.mainloop()
-
-        self.root.overrideredirect(True)
 
     def mouse_down(self, down):
         if hasattr(self, 'gravity') or hasattr(self, 'bounciness') or hasattr(self, 'friction'):
@@ -126,7 +126,6 @@ class Window:
             self.windowY = self.root.winfo_pointery() + self.offsetY
             self.check_window_collision()
             self.root.geometry('+{}+{}'.format(self.root.winfo_pointerx() + self.offsetX, self.root.winfo_pointery() + self.offsetY))
-            self.root.overrideredirect(True)
     
     def on_gravity_change(self, value):
         global GRAVITY
@@ -201,11 +200,9 @@ class Window:
         if i < 400:
             self.root.geometry('+{}+{}'.format(int(center_x - (int(100+i)) / 2), int(center_y - (int(100+i*.5) / 2))))
             self.root.geometry(f'{int(100+i)}x{int(100+i*.5)}')
-            self.root.overrideredirect(True)
             self.root.after(10, self.animate_settings_open, center_x, center_y, i+10)
         else:
             self.root.geometry(f'500x300')
-            self.root.overrideredirect(True)
             self.root.update()
             self.state = "settings"
 
@@ -213,11 +210,9 @@ class Window:
         if i < 400:
             self.root.geometry('+{}+{}'.format(int(center_x - (int(500-i)) / 2), int(center_y - (int(300-i*.5) / 2))))
             self.root.geometry(f'{int(500-i)}x{int(300-i*.5)}')
-            self.root.overrideredirect(True)
             self.root.after(10, self.animate_settings_close, center_x, center_y, i+10)
         else:
             self.root.geometry(f'100x100')
-            self.root.overrideredirect(True)
             self.root.update()
             self.state = "loop"
 
@@ -274,7 +269,6 @@ class Window:
                 self.root.geometry('+{}+{}'.format(int(self.windowX), int(self.windowY)))
                 self.velY += GRAVITY
                 self.velX /= FRICTION
-                self.root.overrideredirect(True)
         
         self.root.after(8, self.loop)
 
@@ -284,7 +278,6 @@ class Window:
             center_y = self.root.winfo_pointery()
             self.root.geometry('+{}+{}'.format(int(center_x - i), int(center_y - i)))
             self.root.geometry(f'{i*2}x{i*2}')
-            self.root.overrideredirect(True)
 
             self.root.after(10, self.animate_grow, i+1)
         else:

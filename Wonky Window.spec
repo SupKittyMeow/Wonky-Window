@@ -45,10 +45,6 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='Wonky Window.app',
-    bundle_identifier='com.supkittymeow.wonkywindow',
-    info_plist={
-        'CFBundleDisplayName': 'Wonky Window',
-        'LSUIElement': True,
-        'NSHighResolutionCapable': True,
-    },
+    icon=None,
+    bundle_identifier=None,
 )
