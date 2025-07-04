@@ -20,7 +20,7 @@ jobs:
               ${{ runner.os }}-pip-
         - run: pip install -r requirements-dev.txt
         - name: Build for MacOS
-          run: pyinstaller --onedir --windowed --name "Wonky Window" --osx-bundle-identifier com.supkittymeow.wonkywindow "Wonky Window.py"
+          run: pyinstaller main.spec
         # - name: Hide from dock
         #   run: python3 hide_from_dock.py
         - name: Import Developer-ID cert
@@ -85,7 +85,7 @@ jobs:
               ${{ runner.os }}-pip-
         - run: pip install -r requirements-dev.txt
         - name: Build for Windows
-          run: pyinstaller --onefile --windowed "Wonky Window.py"
+          run: pyinstaller main.spec
         - name: Upload Windows Artifact
           uses: actions/upload-artifact@v4
           with:
@@ -107,7 +107,7 @@ jobs:
               ${{ runner.os }}-pip-
         - run: pip install -r requirements-dev.txt
         - name: Build for Linux (untested)
-          run: pyinstaller --onefile --windowed "Wonky Window.py"
+          run: pyinstaller main.spec
         - name: Upload Linux Artifact
           uses: actions/upload-artifact@v4
           with:

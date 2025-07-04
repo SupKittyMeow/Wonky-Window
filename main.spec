@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['Wonky Window.py'],
+    ['main.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -12,7 +12,10 @@ a = Analysis(
     runtime_hooks=[],
     excludes=[],
     noarchive=False,
-    optimize=0,
+    optimize=1,
+    onedir=True,
+    onefile=True,
+    windowed=True
 )
 pyz = PYZ(a.pure)
 
