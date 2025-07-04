@@ -13,12 +13,12 @@ class Window:
     def __init__(self):
         self.root = tk.Tk()
         # self.root.withdraw()    
-
         self.root.lift()
         self.root.wm_attributes("-topmost", "true")
         self.root.attributes('-alpha', 0.8)
         self.root.iconify()
-        
+        self.root.overrideredirect(True)     
+
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
 
