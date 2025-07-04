@@ -13,9 +13,7 @@ class Window:
     def __init__(self):
         self.root = tk.Tk()
 
-        # self.root.withdraw()
         self.root.overrideredirect(True)
-        self.root.lift()
         self.root.attributes('-topmost', True)
 
         self.root.attributes('-alpha', 0.8)        
@@ -64,8 +62,6 @@ class Window:
         self.previousFramesX = [0, 0, 0, 0, 0, 0]
         self.previousFramesY = [0, 0, 0, 0, 0, 0]
         self.previousTimestamps = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-
-        # self.root.deiconify()
 
         self.state = "growing"
         self.animate_grow()
