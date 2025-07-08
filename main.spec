@@ -48,6 +48,6 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='Wonky Window.app',
-    icon=icon.icns,
+    icon='icon.icns',
     bundle_identifier=None,
 )
