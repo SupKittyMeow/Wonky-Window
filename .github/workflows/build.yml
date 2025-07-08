@@ -11,13 +11,7 @@ jobs:
         - uses: actions/setup-python@v4
           with:
             python-version: '3.13.5'
-        - name: Cache pip
-          uses: actions/cache@v4
-          with:
-            path: ${{ env.PIP_CACHE_DIR }}
-            key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
-            restore-keys: |
-              ${{ runner.os }}-pip-
+            cache: 'pip'
         - run: pip install -r requirements-dev.txt
         - name: Build for MacOS
           run: pyinstaller main.spec
@@ -76,13 +70,7 @@ jobs:
         - uses: actions/setup-python@v4
           with:
             python-version: '3.13'
-        - name: Cache pip
-          uses: actions/cache@v4
-          with:
-            path: ${{ env.PIP_CACHE_DIR }}
-            key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
-            restore-keys: |
-              ${{ runner.os }}-pip-
+            cache: 'pip'
         - run: pip install -r requirements-dev.txt
         - name: Build for Windows
           run: pyinstaller main.spec
@@ -98,13 +86,7 @@ jobs:
         - uses: actions/setup-python@v4
           with:
             python-version: '3.13'
-        - name: Cache pip
-          uses: actions/cache@v4
-          with:
-            path: ${{ env.PIP_CACHE_DIR }}
-            key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
-            restore-keys: |
-              ${{ runner.os }}-pip-
+            cache: 'pip'
         - run: pip install -r requirements-dev.txt
         - name: Build for Linux (untested)
           run: pyinstaller main.spec
