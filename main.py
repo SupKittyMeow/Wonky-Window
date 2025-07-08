@@ -16,7 +16,7 @@ class Window:
         self.root.overrideredirect(True)
         self.root.attributes('-topmost', True)
 
-        self.root.attributes('-alpha', 0.8)        
+        self.root.attributes('-alpha', 0.8)
 
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
