@@ -12,11 +12,9 @@ jobs:
           with:
             python-version: '3.13.5'
             cache: 'pip'
-        - run: pip install -r requirements-dev.txt
+        - run: pip install -r ./requirements-dev.txt
         - name: Build for MacOS
           run: pyinstaller main.spec
-        # - name: Hide from dock
-        #   run: python3 hide_from_dock.py
         - name: Import Developer-ID cert
           env:
             CERT_B64: ${{ secrets.MAC_CERT_P12_BASE64 }}
@@ -71,7 +69,7 @@ jobs:
           with:
             python-version: '3.13'
             cache: 'pip'
-        - run: pip install -r requirements-dev.txt
+        - run: pip install -r ./requirements-dev.txt
         - name: Build for Windows
           run: pyinstaller main.spec
         - name: Upload Windows Artifact
@@ -87,7 +85,7 @@ jobs:
           with:
             python-version: '3.13'
             cache: 'pip'
-        - run: pip install -r requirements-dev.txt
+        - run: pip install -r ./requirements-dev.txt
         - name: Build for Linux (untested)
           run: pyinstaller main.spec
         - name: Upload Linux Artifact
