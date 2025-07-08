@@ -10,9 +10,9 @@ jobs:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v4
           with:
-            python-version: '3.13.5'
-            cache: 'pip'
-        - run: pip install -r ./requirements-dev.txt
+            python-version: "3.13.5"
+            cache: "pip"
+        - run: pip install -r ./requirements.txt
         - name: Build for MacOS
           run: pyinstaller main.spec
         - name: Import Developer-ID cert
@@ -67,9 +67,9 @@ jobs:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v4
           with:
-            python-version: '3.13'
-            cache: 'pip'
-        - run: pip install -r ./requirements-dev.txt
+            python-version: "3.13"
+            cache: "pip"
+        - run: pip install -r ./requirements.txt
         - name: Build for Windows
           run: pyinstaller main.spec
         - name: Upload Windows Artifact
@@ -83,9 +83,9 @@ jobs:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v4
           with:
-            python-version: '3.13'
-            cache: 'pip'
-        - run: pip install -r ./requirements-dev.txt
+            python-version: "3.13"
+            cache: "pip"
+        - run: pip install -r ./requirements.txt
         - name: Build for Linux (untested)
           run: pyinstaller main.spec
         - name: Upload Linux Artifact
