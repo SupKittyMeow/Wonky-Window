@@ -70,7 +70,7 @@ class Window:
     def mouse_down(self, down):
         if hasattr(self, 'gravity') or hasattr(self, 'bounciness') or hasattr(self, 'friction'):
             widget_under_mouse = self.root.winfo_containing(self.root.winfo_pointerx(), self.root.winfo_pointery())
-            if widget_under_mouse == self.gravity or widget_under_mouse == self.bounciness or widget_under_mouse == self.friction:
+            if widget_under_mouse == self.gravity or widget_under_mouse == self.bounciness or widget_under_mouse == self.friction or widget_under_mouse == self.throw:
                 self.hasBeenUnderMousePreviousFrame = True
                 
         if self.mouseDown == False and down == True:
@@ -140,7 +140,7 @@ class Window:
     
     def on_throw_factor_change(self, value):
         global THROW_FACTOR
-        THROW_FACTOR = float(value)
+        THROW_FACTOR = 750 - float(value)
 
     def on_pop_factor_change(self, value):
         global POP_FACTOR
@@ -165,7 +165,13 @@ class Window:
         self.friction.set(FRICTION)
         self.friction.pack(expand=True)
         self.friction_label = tk.Label(self.root, text="Friction")
-        self.friction_label.pack(pady=(0, 25))
+        self.friction_label.pack(pady=(0, 50))
+
+        self.throw = ttk.Scale(self.root, from_=25, to=700, orient='horizontal', length=300, command=self.on_throw_factor_change)
+        self.throw.set(750 - THROW_FACTOR)
+        self.throw.pack(expand=True)
+        self.throw_label = tk.Label(self.root, text="Throw power")
+        self.throw_label.pack(pady=(0, 25))
 
         self.slide_in_effect()
 
@@ -174,10 +180,12 @@ class Window:
             self.gravity.configure(length=300)
             self.friction.configure(length=300)
             self.bounciness.configure(length=300)
+            self.throw.configure(length=300)
             return
         self.gravity.configure(length=scale)
         self.bounciness.configure(length=scale)
         self.friction.configure(length=scale)
+        self.throw.configure(length=scale)
         self.root.after(1, self.slide_in_effect, scale+2)
     
     def hide_sliders(self, scale=300):
@@ -188,27 +196,30 @@ class Window:
             self.bounciness_label.destroy()
             self.friction.destroy()
             self.friction_label.destroy()
+            self.throw.destroy()
+            self.throw_label.destroy()
             return
         self.gravity.configure(length=scale)
         self.bounciness.configure(length=scale)
         self.friction.configure(length=scale)
+        self.throw.configure(length=scale)
 
         self.root.after(1, self.hide_sliders, scale-2)
 
     def animate_settings_open(self, center_x, center_y, i=0):
         if i < 400:
-            self.root.geometry('+{}+{}'.format(int(center_x - (int(100+i)) / 2), int(center_y - (int(100+i*.5) / 2))))
-            self.root.geometry(f'{int(100+i)}x{int(100+i*.5)}')
+            self.root.geometry('+{}+{}'.format(int(center_x - (int(100+i)) / 2), int(center_y - (int(100+i*.75) / 2))))
+            self.root.geometry(f'{int(100+i)}x{int(100+i*.75)}')
             self.root.after(10, self.animate_settings_open, center_x, center_y, i+10)
         else:
-            self.root.geometry(f'500x300')
+            self.root.geometry(f'500x400')
             self.root.update()
             self.state = "settings"
 
     def animate_settings_close(self, center_x, center_y, i=0):
         if i < 400:
-            self.root.geometry('+{}+{}'.format(int(center_x - (int(500-i)) / 2), int(center_y - (int(300-i*.5) / 2))))
-            self.root.geometry(f'{int(500-i)}x{int(300-i*.5)}')
+            self.root.geometry('+{}+{}'.format(int(center_x - (int(500-i)) / 2), int(center_y - (int(400-i*.75) / 2))))
+            self.root.geometry(f'{int(500-i)}x{int(400-i*.75)}')
             self.root.after(10, self.animate_settings_close, center_x, center_y, i+10)
         else:
             self.root.geometry(f'100x100')
