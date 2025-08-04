@@ -50,7 +50,12 @@ jobs:
               --wait
             xcrun stapler staple "dist/Wonky Window.app"
         - name: Create dmg file
-          run: mkdir -p "dist/dmg_staging" && cp -R "dist/Wonky Window.app" "dist/dmg_staging/" && ln -s /Applications "dist/dmg_staging/Applications" && hdiutil create -volname "Wonky Window" -srcfolder "dist/dmg_staging" -ov -format UDZO "dist/Wonky Window.dmg"
+          run: |
+            hdiutil detach "/Volumes/Wonky Window" || true
+            mkdir -p "dist/dmg_staging"
+            cp -R "dist/Wonky Window.app" "dist/dmg_staging/"
+            ln -s /Applications "dist/dmg_staging/Applications"
+            hdiutil create -volname "Wonky Window" -srcfolder "dist/dmg_staging" -ov -format UDZO "dist/Wonky Window.dmg"
         - name: Upload MacOS Artifact (DMG)
           uses: actions/upload-artifact@v4
           with:
