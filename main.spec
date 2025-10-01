@@ -50,5 +50,13 @@ app = BUNDLE(
     name='Wonky Window.app',
     icon='icon.icns',
     bundle_identifier=None,
-    info_plist='Info.plist'
+    info_plist={
+        'CFBundleDisplayName': 'Wonky Window',
+        'CFBundleName': 'Wonky Window',
+        'CFBundleIdentifier': 'com.supkittymeow.wonkywindow',
+        'CFBundleVersion': '1.0',
+        'NSHighResolutionCapable': True,
+        'NSRequiresAquaSystemAppearance': False,
+        'LSUIElement': True
+    }
 )

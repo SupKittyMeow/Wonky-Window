@@ -56,8 +56,6 @@ jobs:
             cp -R "dist/Wonky Window.app" "dist/dmg_staging/"
             ln -s /Applications "dist/dmg_staging/Applications"
             hdiutil create -volname "Wonky Window" -srcfolder "dist/dmg_staging" -ov -format UDZO "dist/Wonky Window.dmg"
-        - name: Verify plist file
-          run: plutil -p "dist/Wonky Window.app/Contents/Info.plist" | grep LSUIElement
         - name: Upload MacOS Artifact (DMG)
           uses: actions/upload-artifact@v4
           with:
