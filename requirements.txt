@@ -1,1 +1,2 @@
-pyinstaller==6.14.1
+PySide6==6.9.2
+PySideSix-Frameless-Window==0.7.3

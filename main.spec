@@ -50,4 +50,6 @@ app = BUNDLE(
     name='Wonky Window.app',
     icon='icon.icns',
     bundle_identifier=None,
+    version=1.3.0,
+    info_plist='Info.plist'
 )
