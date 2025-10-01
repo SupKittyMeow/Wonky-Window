@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtGui import QCursor
-from PySide6.QtCore import QTimer, QEvent
+from PySide6.QtCore import QTimer, QEvent, Qt
 import qframelesswindow
 import time
 
@@ -12,6 +12,8 @@ THROW_FACTOR = 200
 POP_FACTOR = 2
 FPS = 60
 
+refresh_rate = 60
+
 # Class to handle the window stuff, such as the event handling and the settings stuff
 class Window(qframelesswindow.AcrylicWindow):
     def __init__(self):        
@@ -21,6 +23,7 @@ class Window(qframelesswindow.AcrylicWindow):
         self.setFixedSize(0, 0)
         self.setTitleBar(QWidget()) # oh my god thank you so much chatgpt this took like 2 hours to figure out
         self.toggleStayOnTop()
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         # updating vars setup
         self.last_time: float = time.perf_counter()
@@ -106,10 +109,6 @@ class Window(qframelesswindow.AcrylicWindow):
         self.mouseDown = False
 
     def spawn_animation(self, i=1):
-        current_time = time.perf_counter()
-        delta_time = min(current_time - self.last_time, 0.05)
-        self.last_time = current_time
-
         cursorPos = QCursor.pos()
         center_x = cursorPos.x() - 50 # subtracting 50, as this is half of the width of the window (center it instead of top left)
         center_y = cursorPos.y() - 50
@@ -124,6 +123,9 @@ class Window(qframelesswindow.AcrylicWindow):
             self.posY: float = self.y()
             QTimer.singleShot(16, self.update_physics)
         else:
+            current_time = time.perf_counter()
+            delta_time = min(current_time - self.last_time, 0.05)
+            self.last_time = current_time
             QTimer.singleShot(16, lambda: self.spawn_animation(i+int(250 * delta_time)))
 
     def check_window_collision(self): # TODO: i just copy pasted from the other script, so it no way works
@@ -154,10 +156,6 @@ class Window(qframelesswindow.AcrylicWindow):
                     self.velY = 0
 
     def update_physics(self):
-        current_time = time.perf_counter()
-        delta_time = min(current_time - self.last_time, 0.05)
-        self.last_time = current_time
-
         if self.mouseDown:
             cursorPos = QCursor.pos()
             cursorX = cursorPos.x()
@@ -173,6 +171,10 @@ class Window(qframelesswindow.AcrylicWindow):
             self.previousFramesY.pop(0)
             self.previousTimestamps.pop(0)
         else:
+            current_time = time.perf_counter()
+            delta_time = min(current_time - self.last_time, 0.05)
+            self.last_time = current_time
+            
             self.velY += GRAVITY * delta_time
             self.velX -= self.velX / FRICTION * delta_time
 
@@ -185,11 +187,11 @@ class Window(qframelesswindow.AcrylicWindow):
                     self.velX = 0
                 self.check_window_collision()
             self.move(int(self.posX), int(self.posY))
-
-        QTimer.singleShot(8, self.update_physics)
+        QTimer.singleShot(int(1000/refresh_rate), self.update_physics)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    refresh_rate = app.primaryScreen().refreshRate()
     win = Window()
     app.installEventFilter(win)
     win.show()
