@@ -61,6 +61,8 @@ class Window(qframelesswindow.AcrylicWindow):
             self.onMouseDown(event)
         elif event.type() == QEvent.Type.MouseButtonRelease:
             self.onMouseUp(event)
+        if event.type() == QEvent.Type.Close:
+            QApplication.quit()
         return False
 
     def onMouseDown(self, event):
@@ -192,7 +194,11 @@ class Window(qframelesswindow.AcrylicWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     refresh_rate = app.primaryScreen().refreshRate()
-    win = Window()
-    app.installEventFilter(win)
-    win.show()
+
+    wins = []
+    for _ in range(1):
+        wins.append(Window())
+    for win in wins:
+        win.show()
+        win.installEventFilter(win)
     app.exec()
