@@ -15,7 +15,7 @@ An open-source, cross-platform fidget for your computer.
 ## Installation
 Get the newest release [here](https://github.com/SupKittyMeow/Wonky-Window/releases/latest).
 
-Pre-releases are newer, usually not buggy, however can have bugs, less features, or something else completely.
+Pre-releases are newer, and while they usually art not that buggy, they _can_ have more bugs, less features, or something else completely.
 
 ## Is this a spyware?
 While this app should be signed on macOS, on Windows it will give a bright blue warning.
