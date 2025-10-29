@@ -4,7 +4,7 @@
 
 An open-source, cross-platform fidget for your computer.
 
-[](https://github.com/user-attachments/assets/21e6509d-b119-4299-b61d-2d519ba14107)
+[video.webm](https://github.com/user-attachments/assets/21e6509d-b119-4299-b61d-2d519ba14107)
 
 ## Epic features!1!
 1. A window with gravity and physics that can be interacted with through dragging the mouse and tossing the window around.
