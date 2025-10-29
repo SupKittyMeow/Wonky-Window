@@ -1,4 +1,7 @@
 # Wonky Window
+[![Downloads](https://img.shields.io/github/downloads/SupKittyMeow/Wonky-Window/total.svg)](https://github.com/SupKittyMeow/Wonky-Window/releases)
+
+
 An open-source, cross-platform fidget for your computer.
 
 [video.webm](https://github.com/user-attachments/assets/21e6509d-b119-4299-b61d-2d519ba14107)
@@ -25,3 +28,7 @@ That's just for any app that didn't pay Microsoft I think so idk you're good if 
 no. no it isnt.
 
 (no seriously i have no idea how to code spyware)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=SupKittyMeow/Wonky-Window&type=date&legend=top-left)](https://www.star-history.com/#SupKittyMeow/Wonky-Window&type=date&legend=top-left)
