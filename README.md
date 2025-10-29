@@ -13,7 +13,7 @@ An open-source, cross-platform fidget for your computer.
 5. Small and simple enough that nobody will notice if you are using it when you should be doing literally anything else
 
 ## Installation
-Visit the releases page [here](https://github.com/SupKittyMeow/Wonky-Window/releases/tag/v1.3.0-beta.1).
+Get the newest release [here](https://github.com/SupKittyMeow/Wonky-Window/releases/latest).
 
 Pre-releases are newer, usually not buggy, however can have bugs, less features, or something else completely.
 
