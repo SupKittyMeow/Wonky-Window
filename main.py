@@ -4,6 +4,10 @@ from PySide6.QtGui import QCursor
 from PySide6.QtCore import QTimer, QEvent, Qt
 import qframelesswindow
 import time
+import os
+
+if (sys.platform == 'linux'):
+    os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
 
 BOUNCE_FACTOR = 0.9
 GRAVITY = 9.8
