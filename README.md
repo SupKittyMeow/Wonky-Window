@@ -1,8 +1,6 @@
 # Wonky Window
 [![Downloads](https://img.shields.io/github/downloads/SupKittyMeow/Wonky-Window/total.svg)](https://github.com/SupKittyMeow/Wonky-Window/releases)
 
-[![Winner of zero awards](https://img.shields.io/github/downloads/SupKittyMeow/Wonky-Window/total.svg)](https://github.com/SupKittyMeow/Wonky-Window/releases)
-
 An open-source, cross-platform fidget for your computer.
 
 [video.webm](https://github.com/user-attachments/assets/21e6509d-b119-4299-b61d-2d519ba14107)
