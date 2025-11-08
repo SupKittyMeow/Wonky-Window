@@ -30,12 +30,12 @@ jobs:
           env:
             SIGN_ID: ${{ secrets.CODE_SIGN_IDENTITY }}
           run: |
+            # Note: Ensure the "Wonky Window.app" name exactly matches the name parameter in your main_mac.spec file
             codesign --force --deep --options runtime \
               --entitlements entitlements.plist \
               --timestamp \
               --sign "$SIGN_ID" \
               "dist/Wonky Window.app"
-
         - name: Notarise & staple
           env:
             AC_USERNAME: ${{ secrets.AC_USERNAME }}
@@ -65,7 +65,9 @@ jobs:
           uses: actions/upload-artifact@v5
           with:
             name: WonkyWindow-macos-unsigned
-            path: dist/Wonky Window*
+            path: dist/Wonky Window.app/**
+
+
     build-windows:
         runs-on: windows-latest
         steps:
@@ -77,11 +79,11 @@ jobs:
         - run: pip install -r ./requirements.txt
         - name: Build for Windows
           run: pyinstaller main_windows.spec
-        - name: Upload Windows Artifact
+        - name: Upload Windows Artifact (Portable EXE)
           uses: actions/upload-artifact@v5
           with:
             name: windows-portable
-            path: dist/Wonky Window*
+            path: dist/Wonky Window/*
         - name: Compile .ISS to .EXE Installer
           uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
           with:
@@ -92,6 +94,8 @@ jobs:
           with:
             name: windows_installer
             path: output/WonkyWindowSetup.exe
+            
+            
     build-linux:
         runs-on: ubuntu-latest
         steps:
@@ -107,4 +111,4 @@ jobs:
           uses: actions/upload-artifact@v5
           with:
             name: WonkyWindow-linux
-            path: dist/Wonky Window*
+            path: dist/Wonky Window/*

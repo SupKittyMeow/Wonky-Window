@@ -3,7 +3,7 @@
 
 a = Analysis(
     ['src/main.py'],
-    excludes=['PySide6.QtWebEngineCore', 'PySide6.QtMultimedia', 'PySide6.QtQuick', 'PySide6.QtPrintSupport'],
+    excludes=[],
     pathex=['src'],
     hiddenimports=['qframelesswindow'],
     hookspath=[],
