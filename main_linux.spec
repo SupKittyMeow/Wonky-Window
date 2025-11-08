@@ -24,7 +24,7 @@ exe = EXE(
     name='Wonky Window',
     debug=False,
     bootloader_ignore_signals=False,
-    strip=True,
+    strip=False,
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
@@ -37,6 +37,6 @@ coll = COLLECT(
     exe,
     a.binaries,
     a.datas,
-    strip=True,
+    strip=False,
     name='Wonky Window',
 )
