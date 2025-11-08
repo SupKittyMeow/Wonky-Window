@@ -14,7 +14,7 @@ VSVersionInfo(
     StringFileInfo([
       StringTable('040904B0', [
         StringStruct('CompanyName', 'SupKittyMeow'),
-        StringStruct('FileDescription', 'An open-source, cross-platform fidget for your computer.'),
+        StringStruct('FileDescription', 'Wonky Window'),
         StringStruct('FileVersion', '1.3.0'),
         StringStruct('InternalName', 'wonky-window'),
         StringStruct('LegalCopyright', '© 2025 SupKittyMeow'),
