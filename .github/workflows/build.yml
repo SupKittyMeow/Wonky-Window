@@ -111,7 +111,7 @@ jobs:
           uses: actions/upload-artifact@v5
           with:
             name: windows_installer
-            path: output/setup.exe
+            path: output/WonkyWindowSetup.exe
     build-linux:
         runs-on: ubuntu-latest
         steps:
