@@ -83,7 +83,7 @@ jobs:
           uses: actions/upload-artifact@v5
           with:
             name: windows-portable
-            path: dist/Wonky Window/*
+            path: dist/Wonky Window.exe
         - name: Compile .ISS to .EXE Installer
           uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
           with:
@@ -111,4 +111,4 @@ jobs:
           uses: actions/upload-artifact@v5
           with:
             name: WonkyWindow-linux
-            path: dist/Wonky Window/*
+            path: dist/Wonky Window.exe
