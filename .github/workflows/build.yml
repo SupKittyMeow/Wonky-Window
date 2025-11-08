@@ -7,14 +7,23 @@ jobs:
     build-macos:
         runs-on: macos-14
         steps:
-        - uses: actions/checkout@v3
-        - uses: actions/setup-python@v4
+        - uses: actions/checkout@v5
+        - uses: actions/setup-python@v6
           with:
-            python-version: "3.13.5"
+            python-version: "3.14"
             cache: "pip"
         - run: pip install -r ./requirements.txt
         - name: Build for MacOS
-          run: pyinstaller main.spec
+          run: pyinstaller main_mac.spec
+        - name: Trim unneeded PySide6 stuff
+          run: |
+            target="dist/Wonky Window.app/Contents/MacOS"
+            rm -rf "$target/PySide6/translations" \
+                  "$target/PySide6/plugins/webengine*" \
+                  "$target/PySide6/plugins/multimedia*" \
+                  "$target/PySide6/plugins/printsupport*" \
+                  "$target/PySide6/plugins/quick*" \
+                  "$target/PySide6/plugins/network*" || true
         - name: Import Developer-ID cert
           env:
             CERT_B64: ${{ secrets.MAC_CERT_P12_BASE64 }}
@@ -57,44 +66,75 @@ jobs:
             ln -s /Applications "dist/dmg_staging/Applications"
             hdiutil create -volname "Wonky Window" -srcfolder "dist/dmg_staging" -ov -format UDZO "dist/Wonky Window.dmg"
         - name: Upload MacOS Artifact (DMG)
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v5
           with:
             name: WonkyWindow-macos
             path: dist/Wonky Window.dmg
         - name: Upload MacOS Artifact (.app file)
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v5
           with:
             name: WonkyWindow-macos-unsigned
             path: dist/Wonky Window*
     build-windows:
         runs-on: windows-latest
         steps:
-        - uses: actions/checkout@v3
-        - uses: actions/setup-python@v4
+        - uses: actions/checkout@v5
+        - uses: actions/setup-python@v6
           with:
-            python-version: "3.13"
+            python-version: "3.14"
             cache: "pip"
         - run: pip install -r ./requirements.txt
         - name: Build for Windows
-          run: pyinstaller main.spec
+          run: pyinstaller main_windows.spec
+        - name: Trim unneeded PySide6 stuff
+          shell: pwsh
+          run: |
+            $target = "dist/Wonky Window"
+            Remove-Item -Recurse -Force "$target\PySide6\translations" -ErrorAction SilentlyContinue
+            Remove-Item -Recurse -Force "$target\PySide6\plugins\webengine*" -ErrorAction SilentlyContinue
+            Remove-Item -Recurse -Force "$target\PySide6\plugins\multimedia*" -ErrorAction SilentlyContinue
+            Remove-Item -Recurse -Force "$target\PySide6\plugins\printsupport*" -ErrorAction SilentlyContinue
+            Remove-Item -Recurse -Force "$target\PySide6\plugins\quick*" -ErrorAction SilentlyContinue
+            Remove-Item -Recurse -Force "$target\PySide6\plugins\network*" -ErrorAction SilentlyContinue
+
         - name: Upload Windows Artifact
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v5
           with:
-            name: WonkyWindow-windows
+            name: windows-portable
             path: dist/Wonky Window*
+        - name: Compile .ISS to .EXE Installer
+          uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+          with:
+            path: setup.iss
+            options: /O+
+        - name: Upload installer artifact
+          uses: actions/upload-artifact@v5
+          with:
+            name: windows_installer
+            path: output/setup.exe
     build-linux:
         runs-on: ubuntu-latest
         steps:
-        - uses: actions/checkout@v3
-        - uses: actions/setup-python@v4
+        - uses: actions/checkout@v5
+        - uses: actions/setup-python@v6
           with:
-            python-version: "3.13"
+            python-version: "3.14"
             cache: "pip"
         - run: pip install -r ./requirements.txt
-        - name: Build for Linux (untested)
-          run: pyinstaller main.spec
+        - name: Build for Linux
+          run: pyinstaller main_linux.spec
+        - name: Trim unneeded PySide6 stuff
+          run: |
+            target="dist/Wonky Window"
+            rm -rf "$target/PySide6/translations" \
+                  "$target/PySide6/plugins/webengine*" \
+                  "$target/PySide6/plugins/multimedia*" \
+                  "$target/PySide6/plugins/printsupport*" \
+                  "$target/PySide6/plugins/quick*" \
+                  "$target/PySide6/plugins/network*" || true
+
         - name: Upload Linux Artifact
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v5
           with:
             name: WonkyWindow-linux
             path: dist/Wonky Window*

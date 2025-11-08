@@ -2,20 +2,17 @@
 
 
 a = Analysis(
-    ['main.py'],
-    pathex=[],
+    ['src/main.py'],
+    excludes=['PySide6.QtWebEngineCore', 'PySide6.QtMultimedia', 'PySide6.QtQuick', 'PySide6.QtPrintSupport'],
+    pathex=['src'],
     binaries=[],
     datas=[],
-    hiddenimports=[],
+    hiddenimports=['qframelesswindow'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
     noarchive=False,
     optimize=1,
-    onedir=True,
-    onefile=True,
-    windowed=True
 )
 pyz = PYZ(a.pure)
 
@@ -28,27 +25,25 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
-    entitlements_file=None,
+    entitlements_file=None
 )
+
 coll = COLLECT(
     exe,
     a.binaries,
     a.datas,
     strip=False,
-    upx=True,
-    upx_exclude=[],
     name='Wonky Window',
 )
 app = BUNDLE(
     coll,
     name='Wonky Window.app',
-    icon='icon.icns',
+    icon='src/logos/icons.icns',
     bundle_identifier=None,
     info_plist={
         'CFBundleDisplayName': 'Wonky Window',
