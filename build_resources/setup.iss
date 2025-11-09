@@ -16,7 +16,7 @@ AppId={{F0AAD2FE-98F6-4008-89BA-45FDF7840802}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
-SetupIconFile="src/logos/icons.ico"
+SetupIconFile="..\src\logos\icons.ico"
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -32,7 +32,7 @@ ArchitecturesAllowed=x64compatible
 ; the 64-bit view of the registry.
 ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
-LicenseFile=LICENSE
+LicenseFile="..\LICENSE"
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
 OutputBaseFilename=WonkyWindowSetup
@@ -46,7 +46,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "dist\Wonky Window.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\dist\Wonky Window.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
