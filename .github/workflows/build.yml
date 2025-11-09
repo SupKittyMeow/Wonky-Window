@@ -28,7 +28,10 @@ jobs:
         - if: ${{ github.event_name != 'pull_request' }}
           name: Read version
           id: version
-          run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+          shell: bash
+          run: |
+            test -s VERSION || { echo "VERSION file missing/empty"; exit 1; }
+            echo "version=$(tr -d '\r' < VERSION | sed 's/^v//')" >> "$GITHUB_OUTPUT"
         - if: ${{ github.event_name != 'pull_request' }}
           name: Inject version into Info.plist
           env:
@@ -118,7 +121,10 @@ jobs:
         - run: pip install -r ./requirements.txt
         - name: Read version
           id: version
-          run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+          shell: bash
+          run: |
+            test -s VERSION || { echo "VERSION file missing/empty"; exit 1; }
+            echo "version=$(tr -d '\r' < VERSION | sed 's/^v//')" >> "$GITHUB_OUTPUT"
 
         - name: Create version info
           shell: bash
