@@ -157,7 +157,7 @@ jobs:
             if-no-files-found: error
         - if: ${{ github.event_name != 'pull_request' }}
           name: Compile .ISS to .EXE Installer
-          uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+          uses: Minionguyjpro/Inno-Setup-Action@v1.2.7
           with:
             path: build_resources/setup.iss
             options: /O+  /DMyAppVersion=${{ steps.version.outputs.version }}
