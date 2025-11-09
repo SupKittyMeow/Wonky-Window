@@ -18,6 +18,8 @@ jobs:
     call-workflow:
         uses: SupKittyMeow/Wonky-Window/.github/workflows/build.yml@main
         secrets: inherit
+        with:
+          version: ${{ inputs.tag }}
 
     download-and-release:
         needs: call-workflow
@@ -41,7 +43,7 @@ jobs:
                   name: wonky-window-windows-portable
                   path: ./windows_portable
             - name: Zip Windows portable
-              run: zip -r ./artifacts/WonkyWindow-portable-v${{ inputs.tag }}.zip ./windows_portable
+              run: zip -r ./artifacts/WonkyWindow-windows-portable-v${{ inputs.tag }}.zip ./windows_portable
             - name: Download Linux build
               uses: actions/download-artifact@v5
               with:

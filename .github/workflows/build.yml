@@ -4,6 +4,10 @@ on:
   push:
       branches: [main]
   workflow_call:
+    inputs:
+      version:
+        required: false
+        type: string
   pull_request:
 
 concurrency:
@@ -31,12 +35,15 @@ jobs:
           id: version
           shell: bash
           run: |
-            if [[ ! -s VERSION ]]; then
-              echo "VERSION file missing or empty — using 1.0.0"
-              echo "version=1.0.0" >> "$GITHUB_OUTPUT"
-            else
+            VER="${{ inputs.version }}"
+            if [[ -n "$VER" ]]; then
+              echo "version=$VER" >> "$GITHUB_OUTPUT"
+            elif [[ -s VERSION ]]; then
               echo "version=$(tr -d '\r' < VERSION | sed 's/^v//')" >> "$GITHUB_OUTPUT"
+            else
+              echo "version=1.0.0" >> "$GITHUB_OUTPUT"
             fi
+
         - if: ${{ github.event_name != 'pull_request' }}
           name: Inject version into Info.plist
           env:
@@ -122,11 +129,13 @@ jobs:
           id: version
           shell: bash
           run: |
-            if [[ ! -s VERSION ]]; then
-              echo "VERSION file missing or empty — using 1.0.0"
-              echo "version=1.0.0" >> "$GITHUB_OUTPUT"
-            else
+            VER="${{ inputs.version }}"
+            if [[ -n "$VER" ]]; then
+              echo "version=$VER" >> "$GITHUB_OUTPUT"
+            elif [[ -s VERSION ]]; then
               echo "version=$(tr -d '\r' < VERSION | sed 's/^v//')" >> "$GITHUB_OUTPUT"
+            else
+              echo "version=1.0.0" >> "$GITHUB_OUTPUT"
             fi
 
         - name: Create version info
@@ -190,12 +199,15 @@ jobs:
           id: version
           shell: bash
           run: |
-            if [[ ! -s VERSION ]]; then
-              echo "VERSION file missing or empty — using 1.0.0"
-              echo "version=1.0.0" >> "$GITHUB_OUTPUT"
-            else
+            VER="${{ inputs.version }}"
+            if [[ -n "$VER" ]]; then
+              echo "version=$VER" >> "$GITHUB_OUTPUT"
+            elif [[ -s VERSION ]]; then
               echo "version=$(tr -d '\r' < VERSION | sed 's/^v//')" >> "$GITHUB_OUTPUT"
+            else
+              echo "version=1.0.0" >> "$GITHUB_OUTPUT"
             fi
+
         - name: Build for Linux
           env:
             PYI_APP_VERSION: ${{ steps.version.outputs.version }}
