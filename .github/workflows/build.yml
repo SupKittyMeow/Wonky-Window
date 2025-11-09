@@ -100,16 +100,8 @@ jobs:
           name: Upload MacOS Artifact (DMG)
           uses: actions/upload-artifact@v5
           with:
-            name: wonky-window-macos-dmg
+            name: wonky-window-macos
             path: "dist/Wonky Window.dmg"
-            retention-days: 7
-            if-no-files-found: error
-        - if: ${{ github.event_name != 'pull_request' }}
-          name: Upload MacOS Artifact (.app file)
-          uses: actions/upload-artifact@v5
-          with:
-            name: wonky-window-macos-app
-            path: "dist/Wonky Window.app/**"
             retention-days: 7
             if-no-files-found: error
     build-windows:
