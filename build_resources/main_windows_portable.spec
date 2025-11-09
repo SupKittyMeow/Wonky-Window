@@ -15,6 +15,6 @@ exe = EXE(
     name='Wonky Window',
     version='../version_info.txt',
     icon='../src/logos/icons.ico',
-    console=False
+    console=False,
     onefile=True
 )
