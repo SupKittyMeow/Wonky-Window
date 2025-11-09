@@ -26,7 +26,7 @@ jobs:
             - name: Download macOS dmg
               uses: actions/download-artifact@v5
               with:
-                  name: wonky-window-macos-dmg
+                  name: wonky-window-macos
                   path: ./artifacts
 
             - name: Download Windows installer
@@ -39,13 +39,16 @@ jobs:
               uses: actions/download-artifact@v5
               with:
                   name: wonky-window-windows-portable
-                  path: ./artifacts
+                  path: ./windows_portable
+            - name: Zip Windows portable
+              run: zip -r ./artifacts/wonky-window-windows-portable.zip ./windows_portable
             - name: Download Linux build
               uses: actions/download-artifact@v5
               with:
                 name: wonky-window-linux
-                path: ./artifacts
-                
+                path: ./linux_build
+            - name: Zip Linux build
+              run: zip -r ./artifacts/wonky-window-linux.zip ./linux_build
             - name: Create draft release
               uses: softprops/action-gh-release@v2
               with:

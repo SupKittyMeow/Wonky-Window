@@ -190,12 +190,12 @@ jobs:
               ])])]
             )" > version_info.txt
         - name: Build for Windows
-          run: pyinstaller build_resources/main_windows_portable.spec
+          run: pyinstaller build_resources/main_windows.spec
         - name: Upload Windows Artifact (Portable)
           uses: actions/upload-artifact@v5
           with:
             name: wonky-window-windows-portable
-            path: "dist/Wonky Window.exe"
+            path: "dist/Wonky Window/*"
             retention-days: 7
             if-no-files-found: error
             

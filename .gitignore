@@ -22,3 +22,4 @@ dist/*
 build/*
 output/*
 *.p12
+version_info.txt
