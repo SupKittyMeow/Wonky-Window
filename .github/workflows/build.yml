@@ -150,7 +150,11 @@ jobs:
           env:
             PYI_APP_VERSION: ${{ steps.version.outputs.version }}
           run: pyinstaller build_resources/main_windows.spec
-
+        - name: (Debug) Show dist
+          shell: pwsh
+          run: |
+            Write-Host "---- dist contents ----"
+            Get-ChildItem -Force dist
         - name: Upload Windows Artifact (Portable)
           uses: actions/upload-artifact@v5
           with:
