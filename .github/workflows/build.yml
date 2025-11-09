@@ -163,7 +163,7 @@ jobs:
           uses: actions/upload-artifact@v5
           with:
             name: wonky-window-windows-installer
-            path: output/WonkyWindowSetup.exe
+            path: output/WonkyWindow-Setup.exe
             retention-days: 7
             
             
