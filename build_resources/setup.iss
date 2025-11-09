@@ -8,6 +8,7 @@
 #define MyAppPublisher "SupKittyMeow"
 #define MyAppURL "https://github.com/SupKittyMeow/Wonky-Window"
 #define MyAppExeName "Wonky Window.exe"
+#define MyOutputName "WonkyWindow-Setup"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -36,7 +37,7 @@ LicenseFile="{#SourcePath}\..\LICENSE"
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
 OutputDir="{#SourcePath}\..\output"
-OutputBaseFilename=WonkyWindow-Setup
+OutputBaseFilename={#MyOutputName}-v{#MyAppVersion}
 SolidCompression=yes
 WizardStyle=modern
 
@@ -47,7 +48,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "{#SourcePath}\..\dist\Wonky Window\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourcePath}\..\dist\WonkyWindow-windows-v{#MyAppVersion}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

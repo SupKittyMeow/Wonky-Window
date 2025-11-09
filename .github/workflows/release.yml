@@ -4,7 +4,7 @@ on:
     workflow_dispatch:
         inputs:
             tag:
-                description: "Tag (e.g. v1.0.0)"
+                description: "Tag (e.g. 1.0.0). DO NOT INCLUDE V"
                 required: true
             prerelease:
                 description: "Mark as prerelease?"
@@ -41,20 +41,20 @@ jobs:
                   name: wonky-window-windows-portable
                   path: ./windows_portable
             - name: Zip Windows portable
-              run: zip -r ./artifacts/wonky-window-windows-portable.zip ./windows_portable
+              run: zip -r ./artifacts/WonkyWindow-portable-v${{ inputs.tag }}.zip ./windows_portable
             - name: Download Linux build
               uses: actions/download-artifact@v5
               with:
                 name: wonky-window-linux
                 path: ./linux_build
             - name: Zip Linux build
-              run: zip -r ./artifacts/wonky-window-linux.zip ./linux_build
+              run: zip -r ./artifacts/WonkyWindow-linux-v${{ inputs.tag }}.zip ./linux_build
             - name: Create draft release
               uses: softprops/action-gh-release@v2
               with:
                 draft: true
                 prerelease: ${{ inputs.prerelease }}
-                tag_name: ${{ inputs.tag }}
+                tag_name: v${{ inputs.tag }}
                 target_commitish: ${{ github.sha }}
                 generate_release_notes: true
                 files: ./artifacts/**

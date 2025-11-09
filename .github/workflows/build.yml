@@ -31,8 +31,12 @@ jobs:
           id: version
           shell: bash
           run: |
-            test -s VERSION || { echo "VERSION file missing/empty"; exit 1; }
-            echo "version=$(tr -d '\r' < VERSION | sed 's/^v//')" >> "$GITHUB_OUTPUT"
+            if [[ ! -s VERSION ]]; then
+              echo "VERSION file missing or empty — using 1.0.0"
+              echo "version=1.0.0" >> "$GITHUB_OUTPUT"
+            else
+              echo "version=$(tr -d '\r' < VERSION | sed 's/^v//')" >> "$GITHUB_OUTPUT"
+            fi
         - if: ${{ github.event_name != 'pull_request' }}
           name: Inject version into Info.plist
           env:
@@ -88,7 +92,7 @@ jobs:
             mkdir -p "dist/dmg_staging"
             cp -R "dist/Wonky Window.app" "dist/dmg_staging/"
             ln -s /Applications "dist/dmg_staging/Applications"
-            hdiutil create -volname "Wonky Window" -srcfolder "dist/dmg_staging" -ov -format UDZO "dist/Wonky Window.dmg"
+            hdiutil create -volname "Wonky Window" -srcfolder "dist/dmg_staging" -ov -format UDZO "dist/WonkyWindow-mac-v${{ steps.version.outputs.version }}.dmg"
 
         - if: ${{ github.event_name != 'pull_request' }}
           name: Clean up keychain and cert
@@ -101,7 +105,7 @@ jobs:
           uses: actions/upload-artifact@v5
           with:
             name: wonky-window-macos
-            path: "dist/Wonky Window.dmg"
+            path: "dist/WonkyWindow-mac-v${{ steps.version.outputs.version }}.dmg"
             retention-days: 7
             if-no-files-found: error
     build-windows:
@@ -118,8 +122,12 @@ jobs:
           id: version
           shell: bash
           run: |
-            test -s VERSION || { echo "VERSION file missing/empty"; exit 1; }
-            echo "version=$(tr -d '\r' < VERSION | sed 's/^v//')" >> "$GITHUB_OUTPUT"
+            if [[ ! -s VERSION ]]; then
+              echo "VERSION file missing or empty — using 1.0.0"
+              echo "version=1.0.0" >> "$GITHUB_OUTPUT"
+            else
+              echo "version=$(tr -d '\r' < VERSION | sed 's/^v//')" >> "$GITHUB_OUTPUT"
+            fi
 
         - name: Create version info
           shell: bash
@@ -139,7 +147,17 @@ jobs:
               ])])]
             )" > version_info.txt
         - name: Build for Windows
+          env:
+            PYI_APP_VERSION: ${{ steps.version.outputs.version }}
           run: pyinstaller build_resources/main_windows.spec
+
+        - name: Upload Windows Artifact (Portable)
+          uses: actions/upload-artifact@v5
+          with:
+            name: wonky-window-windows-portable
+            path: "dist/WonkyWindow-portable-v${{ steps.version.outputs.version }}/*"
+            retention-days: 7
+            if-no-files-found: error
         - if: ${{ github.event_name != 'pull_request' }}
           name: Compile .ISS to .EXE Installer
           uses: Minionguyjpro/Inno-Setup-Action@v1.2.7
@@ -151,12 +169,11 @@ jobs:
           uses: actions/upload-artifact@v5
           with:
             name: wonky-window-windows-installer
-            path: output/WonkyWindow-Setup.exe
+            path: "output/WonkyWindow-Setup-v${{ steps.version.outputs.version }}.exe"
             retention-days: 7
             if-no-files-found: error
-
-    build-windows-portable:
-        runs-on: windows-latest
+    build-linux:
+        runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v5
         - uses: actions/setup-python@v6
@@ -169,54 +186,22 @@ jobs:
           id: version
           shell: bash
           run: |
-            test -s VERSION || { echo "VERSION file missing/empty"; exit 1; }
-            echo "version=$(tr -d '\r' < VERSION | sed 's/^v//')" >> "$GITHUB_OUTPUT"
-
-        - name: Create version info
-          shell: bash
-          env:
-            VER: ${{ steps.version.outputs.version }}
-          run: |
-            echo "VSVersionInfo(
-              ffi=FixedFileInfo(
-                filevers=(${VER//./,},0),
-                prodvers=(${VER//./,},0)
-              ),
-              kids=[StringFileInfo([StringTable('040904B0', [
-                StringStruct('FileDescription', 'Wonky Window'),
-                StringStruct('FileVersion', '$VER'),
-                StringStruct('ProductName', 'Wonky Window'),
-                StringStruct('ProductVersion', '$VER')
-              ])])]
-            )" > version_info.txt
-        - name: Build for Windows
-          run: pyinstaller build_resources/main_windows.spec
-        - name: Upload Windows Artifact (Portable)
-          uses: actions/upload-artifact@v5
-          with:
-            name: wonky-window-windows-portable
-            path: "dist/Wonky Window/*"
-            retention-days: 7
-            if-no-files-found: error
-            
-            
-    build-linux:
-        runs-on: ubuntu-latest
-        steps:
-        - uses: actions/checkout@v5
-        - uses: actions/setup-python@v6
-          with:
-            python-version: "3.12"
-            cache: "pip"
-            cache-dependency-path: requirements.txt
-        - run: pip install -r ./requirements.txt
+            if [[ ! -s VERSION ]]; then
+              echo "VERSION file missing or empty — using 1.0.0"
+              echo "version=1.0.0" >> "$GITHUB_OUTPUT"
+            else
+              echo "version=$(tr -d '\r' < VERSION | sed 's/^v//')" >> "$GITHUB_OUTPUT"
+            fi
         - name: Build for Linux
+          env:
+            PYI_APP_VERSION: ${{ steps.version.outputs.version }}
+            PORTABLE: portable-
           run: pyinstaller build_resources/main_linux.spec
         - if: ${{ github.event_name != 'pull_request' }}
           name: Upload Linux Artifact
           uses: actions/upload-artifact@v5
           with:
             name: wonky-window-linux
-            path: "dist/Wonky Window*"
+            path: "dist/WonkyWindow-linux-v${{ steps.version.outputs.version }}*"
             retention-days: 7
             if-no-files-found: error

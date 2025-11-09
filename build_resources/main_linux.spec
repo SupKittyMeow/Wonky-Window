@@ -1,5 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import os
 
 a = Analysis(
     ['../src/main.py'],
@@ -21,5 +22,5 @@ coll = COLLECT(
     exe,
     a.binaries,
     a.datas,
-    name='Wonky Window',
+    name=f"WonkyWindow-linux-v{os.getenv('PYI_APP_VERSION', '1.0.0')}",
 )
