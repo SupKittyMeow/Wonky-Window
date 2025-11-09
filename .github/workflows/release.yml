@@ -60,3 +60,4 @@ jobs:
                 target_commitish: ${{ github.sha }}
                 generate_release_notes: true
                 files: ./artifacts/**
+                overwrite_files: true
