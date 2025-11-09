@@ -159,7 +159,7 @@ jobs:
           uses: actions/upload-artifact@v5
           with:
             name: wonky-window-windows-portable
-            path: "dist/WonkyWindow-portable-v${{ steps.version.outputs.version }}/*"
+            path: "dist/WonkyWindow-windows-portable-v${{ steps.version.outputs.version }}/*"
             retention-days: 7
             if-no-files-found: error
         - if: ${{ github.event_name != 'pull_request' }}
@@ -173,7 +173,7 @@ jobs:
           uses: actions/upload-artifact@v5
           with:
             name: wonky-window-windows-installer
-            path: "output/WonkyWindow-Setup-v${{ steps.version.outputs.version }}.exe"
+            path: "output/WonkyWindow-windows-installer-v${{ steps.version.outputs.version }}.exe"
             retention-days: 7
             if-no-files-found: error
     build-linux:

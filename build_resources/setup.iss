@@ -8,7 +8,7 @@
 #define MyAppPublisher "SupKittyMeow"
 #define MyAppURL "https://github.com/SupKittyMeow/Wonky-Window"
 #define MyAppExeName "Wonky Window.exe"
-#define MyOutputName "WonkyWindow-Setup"
+#define MyOutputName "WonkyWindow-windows-installer"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
