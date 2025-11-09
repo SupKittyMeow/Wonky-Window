@@ -99,7 +99,7 @@ jobs:
             mkdir -p "dist/dmg_staging"
             cp -R "dist/Wonky Window.app" "dist/dmg_staging/"
             ln -s /Applications "dist/dmg_staging/Applications"
-            hdiutil create -volname "Wonky Window" -srcfolder "dist/dmg_staging" -ov -format UDZO "dist/WonkyWindow-mac-v${{ steps.version.outputs.version }}.dmg"
+            hdiutil create -volname "Wonky Window" -srcfolder "dist/dmg_staging" -ov -format UDZO "dist/WonkyWindow-macOS-v${{ steps.version.outputs.version }}.dmg"
 
         - if: ${{ github.event_name != 'pull_request' }}
           name: Clean up keychain and cert
@@ -112,7 +112,7 @@ jobs:
           uses: actions/upload-artifact@v5
           with:
             name: wonky-window-macos
-            path: "dist/WonkyWindow-mac-v${{ steps.version.outputs.version }}.dmg"
+            path: "dist/WonkyWindow-macOS-v${{ steps.version.outputs.version }}.dmg"
             retention-days: 7
             if-no-files-found: error
     build-windows:
