@@ -102,6 +102,7 @@ jobs:
             name: wonky-window-macos-dmg
             path: "dist/Wonky Window.dmg"
             retention-days: 7
+            if-no-files-found: error
         - if: ${{ github.event_name != 'pull_request' }}
           name: Upload MacOS Artifact (.app file)
           uses: actions/upload-artifact@v5
@@ -109,6 +110,7 @@ jobs:
             name: wonky-window-macos-app
             path: "dist/Wonky Window.app/**"
             retention-days: 7
+            if-no-files-found: error
     build-windows:
         runs-on: windows-latest
         steps:
@@ -152,6 +154,7 @@ jobs:
             name: wonky-window-windows-portable
             path: "dist/Wonky Window.exe"
             retention-days: 7
+            if-no-files-found: error
         - if: ${{ github.event_name != 'pull_request' }}
           name: Compile .ISS to .EXE Installer
           uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
@@ -165,6 +168,7 @@ jobs:
             name: wonky-window-windows-installer
             path: output/WonkyWindow-Setup.exe
             retention-days: 7
+            if-no-files-found: error
             
             
     build-linux:
@@ -186,3 +190,4 @@ jobs:
             name: wonky-window-linux
             path: "dist/Wonky Window*"
             retention-days: 7
+            if-no-files-found: error
