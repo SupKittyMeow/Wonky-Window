@@ -2,7 +2,7 @@
 
 a = Analysis(
     ['../src/main.py'],
-    pathex=['src'],
+    pathex=['../src'],
     hiddenimports=['qframelesswindow'],
     optimize=1,
 )

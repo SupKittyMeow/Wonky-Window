@@ -195,7 +195,7 @@ jobs:
           uses: actions/upload-artifact@v5
           with:
             name: wonky-window-windows-portable
-            path: "dist/Wonky Window/**"
+            path: "dist/Wonky Window.exe"
             retention-days: 7
             if-no-files-found: error
             

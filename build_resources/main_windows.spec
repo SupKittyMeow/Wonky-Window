@@ -3,7 +3,7 @@
 
 a = Analysis(
     ['../src/main.py'],
-    pathex=['src'],
+    pathex=['../src'],
     hiddenimports=['qframelesswindow'],
     optimize=1
 )
@@ -16,4 +16,11 @@ exe = EXE(
     version='../version_info.txt',
     icon='../src/logos/icons.ico',
     console=False
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.datas,
+    name='Wonky Window',
 )
