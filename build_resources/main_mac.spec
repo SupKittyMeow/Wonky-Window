@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 a = Analysis(
-    ['src/main.py'],
+    ['../src/main.py'],
     pathex=['src'],
     hiddenimports=['qframelesswindow'],
     optimize=1,
@@ -27,7 +27,7 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='Wonky Window.app',
-    icon='src/logos/icons.icns',
+    icon='../src/logos/icons.icns',
     bundle_identifier='com.supkittymeow.wonkywindow',
     info_plist={
         'CFBundleDisplayName': 'Wonky Window',

@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['src/main.py'],
+    ['../src/main.py'],
     pathex=['src'],
     hiddenimports=['qframelesswindow'],
     optimize=1
@@ -13,7 +13,7 @@ exe = EXE(
     pyz,
     a.scripts,
     name='Wonky Window',
-    version='version_info.txt',
-    icon='src/logos/icons.ico',
+    version='../version_info.txt',
+    icon='../src/logos/icons.ico',
     console=False
 )
