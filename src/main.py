@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtGui import QCursor, QScreen
 from PySide6.QtCore import QTimer, QEvent, Qt
 import qframelesswindow
@@ -9,9 +9,9 @@ import os
 if (sys.platform == 'linux'):
     os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
 
-BOUNCE_FACTOR = 0.9
-GRAVITY = 9.8
-FRICTION = 1
+BOUNCE_FACTOR = 1
+GRAVITY = 5
+FRICTION = 3
 THROW_FACTOR = 200
 POP_FACTOR = 2
 FPS = 60
@@ -26,11 +26,12 @@ class Window(qframelesswindow.AcrylicWindow):
         self.setWindowTitle("Wonky Window")
         self.setFixedSize(0, 0)
         self.setResizeEnabled(False)
-        
-        self.titleBar.hide()
-        
-        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowDoesNotAcceptFocus | Qt.WindowType.WindowStaysOnTopHint)
 
+        self.setTitleBar(QWidget()) # don't use self.titleBar.hide() here because this takes full screen and lets focus be IMMEDIATELY grabbed
+
+        self.toggleStayOnTop()
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        
         self.setStyleSheet("CustomAcrylicWindow {border-radius: 10px;}") # Library handles the actual OS-level rounding/blur. Without this (idk why) it won't adhere to system theme on Windows
         
         # updating vars setup
@@ -206,8 +207,8 @@ class Window(qframelesswindow.AcrylicWindow):
             delta_time = min(current_time - self.last_time, 0.05)
             self.last_time = current_time
             
-            self.velY += GRAVITY * delta_time
-            self.velX -= self.velX / FRICTION * delta_time
+            self.velY += GRAVITY * delta_time * self.screen().devicePixelRatio()
+            self.velX -= self.velX / FRICTION * delta_time * self.screen().devicePixelRatio()
 
             self.posX += self.velX
             self.posY += self.velY
