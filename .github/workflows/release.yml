@@ -23,11 +23,29 @@ jobs:
         needs: call-workflow
         runs-on: ubuntu-latest
         steps:
-            - name: download-built-artifact
+            - name: Download macOS dmg
               uses: actions/download-artifact@v5
               with:
+                  name: wonky-window-macos-dmg
+                  path: ./artifacts
+
+            - name: Download Windows installer
+              uses: actions/download-artifact@v5
+              with:
+                  name: wonky-window-windows-installer
+                  path: ./artifacts
+
+            - name: Download Windows portable
+              uses: actions/download-artifact@v5
+              with:
+                  name: wonky-window-windows-portable
+                  path: ./artifacts
+            - name: Download Linux build
+              uses: actions/download-artifact@v5
+              with:
+                name: wonky-window-linux
                 path: ./artifacts
-                pattern: wonky-window-*
+                
             - name: Create draft release
               uses: softprops/action-gh-release@v2
               with:
