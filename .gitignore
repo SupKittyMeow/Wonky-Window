@@ -1,3 +1,25 @@
+# Bytecode / cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# Logs / misc
+*.log
+*.tmp
+
+# Packaging
+*.egg-info/
+*.spec
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+
+# Built stuff
 dist/*
 build/*
-.DS_Store
+output/*
+*.p12

@@ -2,7 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Wonky Window"
-#define MyAppVersion "1.3.0"
+#ifndef MyAppVersion
+  #define MyAppVersion "1.0.0"
+#endif
 #define MyAppPublisher "SupKittyMeow"
 #define MyAppURL "https://github.com/SupKittyMeow/Wonky-Window"
 #define MyAppExeName "Wonky Window.exe"

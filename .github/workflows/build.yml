@@ -2,6 +2,15 @@ name: Build apps
 
 on:
   push:
+  workflow_call:
+  pull_request:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
     build-macos:
@@ -12,10 +21,27 @@ jobs:
           with:
             python-version: "3.12"
             cache: "pip"
+            cache-dependency-path: requirements.txt
         - run: pip install -r ./requirements.txt
         - name: Build for MacOS
-          run: pyinstaller main_mac.spec
-        - name: Import Developer-ID cert
+          run: pyinstaller build_resources/main_mac.spec
+        - if: ${{ github.event_name != 'pull_request' }}
+          name: Read version
+          id: version
+          run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+        - if: ${{ github.event_name != 'pull_request' }}
+          name: Inject version into Info.plist
+          env:
+            VER: ${{ steps.version.outputs.version }}
+            BUILD: ${{ github.run_number }}
+          run: |
+            PLIST="dist/Wonky Window.app/Contents/Info.plist"
+            /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VER" "$PLIST" \
+              || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string $VER" "$PLIST"
+            /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD" "$PLIST" \
+              || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD" "$PLIST"
+        - if: ${{ github.event_name != 'pull_request' }}
+          name: Import Developer-ID cert
           env:
             CERT_B64: ${{ secrets.MAC_CERT_P12_BASE64 }}
             CERT_PASS: ${{ secrets.MAC_CERT_PASSWORD }}
@@ -26,17 +52,19 @@ jobs:
             security unlock-keychain -p "" build.keychain
             security import /tmp/cert.p12 -k build.keychain -P "$CERT_PASS" -T /usr/bin/codesign
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" build.keychain
-        - name: Codesign app
+          
+        - if: ${{ github.event_name != 'pull_request' }}
+          name: Codesign app
           env:
             SIGN_ID: ${{ secrets.CODE_SIGN_IDENTITY }}
           run: |
             # Note: Ensure the "Wonky Window.app" name exactly matches the name parameter in your main_mac.spec file
             codesign --force --deep --options runtime \
-              --entitlements entitlements.plist \
               --timestamp \
               --sign "$SIGN_ID" \
               "dist/Wonky Window.app"
-        - name: Notarise & staple
+        - if: ${{ github.event_name != 'pull_request' }}
+          name: Notarise & staple
           env:
             AC_USERNAME: ${{ secrets.AC_USERNAME }}
             AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
@@ -49,25 +77,35 @@ jobs:
               --password "$AC_PASSWORD" \
               --wait
             xcrun stapler staple "dist/Wonky Window.app"
-        - name: Create dmg file
+        - if: ${{ github.event_name != 'pull_request' }}
+          name: Create dmg file
           run: |
             hdiutil detach "/Volumes/Wonky Window" || true
             mkdir -p "dist/dmg_staging"
             cp -R "dist/Wonky Window.app" "dist/dmg_staging/"
             ln -s /Applications "dist/dmg_staging/Applications"
             hdiutil create -volname "Wonky Window" -srcfolder "dist/dmg_staging" -ov -format UDZO "dist/Wonky Window.dmg"
-        - name: Upload MacOS Artifact (DMG)
+
+        - if: ${{ github.event_name != 'pull_request' }}
+          name: Clean up keychain and cert
+          run: |
+            security delete-keychain build.keychain || true
+            rm -f /tmp/cert.p12
+
+        - if: ${{ github.event_name != 'pull_request' }}
+          name: Upload MacOS Artifact (DMG)
           uses: actions/upload-artifact@v5
           with:
-            name: WonkyWindow-macos
-            path: dist/Wonky Window.dmg
-        - name: Upload MacOS Artifact (.app file)
+            name: wonky-window-macos-dmg
+            path: "dist/Wonky Window.dmg"
+            retention-days: 7
+        - if: ${{ github.event_name != 'pull_request' }}
+          name: Upload MacOS Artifact (.app file)
           uses: actions/upload-artifact@v5
           with:
-            name: WonkyWindow-macos-unsigned
-            path: dist/Wonky Window.app/**
-
-
+            name: wonky-window-macos-app
+            path: "dist/Wonky Window.app/**"
+            retention-days: 7
     build-windows:
         runs-on: windows-latest
         steps:
@@ -76,24 +114,51 @@ jobs:
           with:
             python-version: "3.12"
             cache: "pip"
+            cache-dependency-path: requirements.txt
         - run: pip install -r ./requirements.txt
+        - name: Read version
+          id: version
+          run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+
+        - name: Create version info
+          shell: bash
+          env:
+            VER: ${{ steps.version.outputs.version }}
+          run: |
+            echo "VSVersionInfo(
+              ffi=FixedFileInfo(
+                filevers=(${VER//./,},0),
+                prodvers=(${VER//./,},0)
+              ),
+              kids=[StringFileInfo([StringTable('040904B0', [
+                StringStruct('FileDescription', 'Wonky Window'),
+                StringStruct('FileVersion', '$VER'),
+                StringStruct('ProductName', 'Wonky Window'),
+                StringStruct('ProductVersion', '$VER')
+              ])])]
+            )" > version_info.txt
         - name: Build for Windows
-          run: pyinstaller main_windows.spec
-        - name: Upload Windows Artifact (Portable EXE)
+          run: pyinstaller build_resources/main_windows.spec
+        - if: ${{ github.event_name != 'pull_request' }}
+          name: Upload Windows Artifact (Portable EXE)
           uses: actions/upload-artifact@v5
           with:
-            name: windows-portable
-            path: dist/Wonky Window.exe
-        - name: Compile .ISS to .EXE Installer
+            name: wonky-window-windows-portable
+            path: "dist/Wonky Window.exe"
+            retention-days: 7
+        - if: ${{ github.event_name != 'pull_request' }}
+          name: Compile .ISS to .EXE Installer
           uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
           with:
-            path: setup.iss
-            options: /O+
-        - name: Upload installer artifact
+            path: build_resources/setup.iss
+            options: /O+  /DMyAppVersion=${{ steps.version.outputs.version }}
+        - if: ${{ github.event_name != 'pull_request' }}
+          name: Upload installer artifact
           uses: actions/upload-artifact@v5
           with:
-            name: windows-installer
+            name: wonky-window-windows-installer
             path: output/WonkyWindowSetup.exe
+            retention-days: 7
             
             
     build-linux:
@@ -104,11 +169,14 @@ jobs:
           with:
             python-version: "3.12"
             cache: "pip"
+            cache-dependency-path: requirements.txt
         - run: pip install -r ./requirements.txt
         - name: Build for Linux
-          run: pyinstaller main_linux.spec
-        - name: Upload Linux Artifact
+          run: pyinstaller build_resources/main_linux.spec
+        - if: ${{ github.event_name != 'pull_request' }}
+          name: Upload Linux Artifact
           uses: actions/upload-artifact@v5
           with:
-            name: WonkyWindow-linux
-            path: dist/Wonky Window*
+            name: wonky-window-linux
+            path: "dist/Wonky Window*"
+            retention-days: 7

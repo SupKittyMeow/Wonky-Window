@@ -1,0 +1,38 @@
+name: Create release draft
+
+on:
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: "Tag (e.g. v1.0.0)"
+                required: true
+            prerelease:
+                description: "Mark as prerelease?"
+                type: boolean
+                default: false
+    
+permissions: 
+    contents: write
+
+jobs:
+    call-workflow:
+        uses: SupKittyMeow/Wonky-Window/.github/workflows/build.yml@main
+        secrets: inherit
+
+    download-and-release:
+        needs: call-workflow
+        runs-on: ubuntu-latest
+        steps:
+            - name: download-built-artifact
+              uses: actions/download-artifact@v5
+              with:
+                path: ./artifacts
+            - name: Create draft release
+              uses: softprops/action-gh-release@v2
+              with:
+                draft: true
+                prerelease: ${{ inputs.prerelease }}
+                tag_name: ${{ inputs.tag }}
+                target_commitish: ${{ github.sha }}
+                generate_release_notes: true
+                files: ./artifacts/**
