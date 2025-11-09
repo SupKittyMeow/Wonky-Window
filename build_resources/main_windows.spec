@@ -23,5 +23,5 @@ coll = COLLECT(
     exe,
     a.binaries,
     a.datas,
-    name=f"WonkyWindow-portable-v{os.getenv('PYI_APP_VERSION', '1.0.0')}",
+    name=f"WonkyWindow-windows-portable-v{os.getenv('PYI_APP_VERSION', '1.0.0')}",
 )
