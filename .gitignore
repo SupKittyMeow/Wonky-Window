@@ -12,7 +12,6 @@ venv/
 
 # Packaging
 *.egg-info/
-*.spec
 
 # OS / editor junk
 .DS_Store
