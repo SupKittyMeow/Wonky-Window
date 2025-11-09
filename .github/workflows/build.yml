@@ -161,7 +161,7 @@ jobs:
           uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
           with:
             path: build_resources/setup.iss
-            options: /O+  /DMyAppVersion=${{ steps.version.outputs.version }}
+            options: /DMyAppVersion=${{ steps.version.outputs.version }}
         - if: ${{ github.event_name != 'pull_request' }}
           name: Upload installer artifact
           uses: actions/upload-artifact@v5
