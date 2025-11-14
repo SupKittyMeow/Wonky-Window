@@ -92,38 +92,44 @@ class Window(qframelesswindow.AcrylicWindow):
         self.previousFramesX = [0, 0, 0, 0, 0, 0]
         self.previousFramesY = [0, 0, 0, 0, 0, 0]
 
+        self.framesHeldDown = 0
+
         self.mouseDown = True
-    
+
     def onMouseUp(self, event):
         self.releaseMouse()
-        distancesX = []
-        distancesY = []
-        
-        i = 0
-        for frame in self.previousFramesX:
-            if i == 0:
-                i += 1
-                continue
 
-            try:
-                distancesX.append((self.previousFramesX[i] - self.previousFramesX[i-1]) / (self.previousTimestamps[i] - self.previousTimestamps[i-1]))
-            except Exception:
-                distancesX.append(0)
-            i += 1
-        i = 0
-        for frame in self.previousFramesY:
-            if i == 0:
-                i += 1
-                continue
-            try:
-                distancesY.append((self.previousFramesY[i] - self.previousFramesY[i-1]) / (self.previousTimestamps[i] - self.previousTimestamps[i-1]))
-            except Exception:
-                distancesY.append(0)
-            i += 1
+        if self.mouseDown:
+            if self.framesHeldDown >= 6:
+                distancesX = []
+                distancesY = []
+                
+                i = 0
+                for frame in self.previousFramesX:
+                    if i == 0:
+                        i += 1
+                        continue
 
-        self.velX = sum(distancesX) / len(distancesX) / THROW_FACTOR
-        self.velY = sum(distancesY) / len(distancesY) / THROW_FACTOR
-        self.mouseDown = False
+                    try:
+                        distancesX.append((self.previousFramesX[i] - self.previousFramesX[i-1]) / (self.previousTimestamps[i] - self.previousTimestamps[i-1]))
+                    except Exception:
+                        distancesX.append(0)
+                    i += 1
+                i = 0
+                for frame in self.previousFramesY:
+                    if i == 0:
+                        i += 1
+                        continue
+                    try:
+                        distancesY.append((self.previousFramesY[i] - self.previousFramesY[i-1]) / (self.previousTimestamps[i] - self.previousTimestamps[i-1]))
+                    except Exception:
+                        distancesY.append(0)
+                    i += 1
+
+                self.velX = sum(distancesX) / len(distancesX) / THROW_FACTOR
+                self.velY = sum(distancesY) / len(distancesY) / THROW_FACTOR
+            
+            self.mouseDown = False
     
     def spawn_animation(self, i=1):
         cursorPos = QCursor.pos()
@@ -195,6 +201,8 @@ class Window(qframelesswindow.AcrylicWindow):
 
             self.posX = cursorX + self.mouseOffsetX
             self.posY = cursorY + self.mouseOffsetY
+
+            self.framesHeldDown += 1
 
             self.previousFramesX.append(cursorX)
             self.previousFramesY.append(cursorY)
