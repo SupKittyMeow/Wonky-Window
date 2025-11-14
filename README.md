@@ -34,7 +34,7 @@ No. No it isnt.
 when i made this (and probably still now but who knows) theres like 0 stars so its just a blank graph lol
 
 ## License
-While it used to be under the MIT license, I realised that since I'm using [PyQt-Frameless-Window](https://github.com/zhiyiYo/PyQt-Frameless-Window), which is under GPLv3, I also have to use that.
+While this software used to be under the MIT license, I realised that since I'm using [PyQt-Frameless-Window](https://github.com/zhiyiYo/PyQt-Frameless-Window), which is under GPLv3, I also have to use that.
 
 Wonky Window is licensed under [GPLv3](./LICENSE)
 
