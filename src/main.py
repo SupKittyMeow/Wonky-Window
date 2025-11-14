@@ -84,7 +84,7 @@ class Window(AcrylicWindow):
             user32.SetWindowPos(hwnd, 0, 0, 0, 0, 0, 0x0023)
 
     def eventFilter(self, obj, event):
-        if event.type() == QEvent.Type.MouseButtonPress:
+        if event.type() == QEvent.Type.MouseButtonPress or event.type() == QEvent.Type.MouseButtonDblClick:
             self.onMouseDown(event)
         elif event.type() == QEvent.Type.MouseButtonRelease:
             self.onMouseUp(event)
