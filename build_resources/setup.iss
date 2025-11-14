@@ -2,10 +2,13 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Wonky Window"
-#define MyAppVersion "1.3.0"
+#ifndef MyAppVersion
+  #define MyAppVersion "1.0.0"
+#endif
 #define MyAppPublisher "SupKittyMeow"
 #define MyAppURL "https://github.com/SupKittyMeow/Wonky-Window"
 #define MyAppExeName "Wonky Window.exe"
+#define MyOutputName "WonkyWindow-windows-installer"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -14,7 +17,7 @@ AppId={{F0AAD2FE-98F6-4008-89BA-45FDF7840802}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
-SetupIconFile="src/logos/icons.ico"
+SetupIconFile="{#SourcePath}\..\src\logos\icons.ico"
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -30,10 +33,11 @@ ArchitecturesAllowed=x64compatible
 ; the 64-bit view of the registry.
 ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
-LicenseFile=LICENSE
+LicenseFile="{#SourcePath}\..\LICENSE"
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
-OutputBaseFilename=WonkyWindowSetup
+OutputDir="{#SourcePath}\..\output"
+OutputBaseFilename={#MyOutputName}-v{#MyAppVersion}
 SolidCompression=yes
 WizardStyle=modern
 
@@ -44,7 +48,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "dist\Wonky Window.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#SourcePath}\..\dist\WonkyWindow-windows-portable-v{#MyAppVersion}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

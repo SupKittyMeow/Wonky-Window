@@ -29,7 +29,13 @@ No. No it isnt.
 (seriously i have no idea how to code spyware)
 
 ## Star History
-
 [![Star History Chart](https://api.star-history.com/svg?repos=SupKittyMeow/Wonky-Window&type=date&legend=top-left)](https://www.star-history.com/#SupKittyMeow/Wonky-Window&type=date&legend=top-left)
 
 when i made this (and probably still now but who knows) theres like 0 stars so its just a blank graph lol
+
+## License
+While it used to be under the MIT license, I realised that since I'm using [PyQt-Frameless-Window](https://github.com/zhiyiYo/PyQt-Frameless-Window), which is under GPLv3, I also have to use that.
+
+Wonky Window is licensed under [GPLv3](./LICENSE)
+
+Copyright © 2025 by SupKittyMeow.

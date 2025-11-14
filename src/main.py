@@ -2,7 +2,7 @@ import sys
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtGui import QCursor, QScreen
 from PySide6.QtCore import QTimer, QEvent, Qt
-import qframelesswindow
+from qframelesswindow import AcrylicWindow
 import time
 import os
 
@@ -19,20 +19,19 @@ FPS = 60
 refresh_rate = 60
 
 # Class to handle the window stuff, such as the event handling and the settings stuff
-class Window(qframelesswindow.AcrylicWindow):
+class Window(AcrylicWindow):
     def __init__(self):        
         # basic setup stuff
         super().__init__()
         self.setWindowTitle("Wonky Window")
-        self.setFixedSize(0, 0)
+        self.setFixedSize(1, 1)
         self.setResizeEnabled(False)
 
         self.setTitleBar(QWidget()) # don't use self.titleBar.hide() here because this takes full screen and lets focus be IMMEDIATELY grabbed
 
         self.toggleStayOnTop()
-        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        
-        self.setStyleSheet("CustomAcrylicWindow {border-radius: 10px;}") # Library handles the actual OS-level rounding/blur. Without this (idk why) it won't adhere to system theme on Windows
+
+        self.hide_from_alt_tab()        
         
         # updating vars setup
         self.last_time: float = time.perf_counter()
@@ -71,6 +70,19 @@ class Window(qframelesswindow.AcrylicWindow):
         # start the spawning anim!
         self.spawn_animation()
     
+    def hide_from_alt_tab(self):
+        if sys.platform == "win32":
+            import ctypes
+            hwnd = self.winId()
+            GWL_EXSTYLE = -20
+            WS_EX_TOOLWINDOW = 0x00000080
+            WS_EX_APPWINDOW = 0x00040000
+            user32 = ctypes.windll.user32
+            current_style = user32.GetWindowLongPtrA(hwnd, GWL_EXSTYLE)
+            new_style = (current_style | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW
+            user32.SetWindowLongPtrA(hwnd, GWL_EXSTYLE, new_style)
+            user32.SetWindowPos(hwnd, 0, 0, 0, 0, 0, 0x0023)
+
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Type.MouseButtonPress:
             self.onMouseDown(event)

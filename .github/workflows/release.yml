@@ -1,0 +1,63 @@
+name: Create release draft
+
+on:
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: "Tag (e.g. 1.0.0). DO NOT INCLUDE V"
+                required: true
+            prerelease:
+                description: "Mark as prerelease?"
+                type: boolean
+                default: false
+    
+permissions: 
+    contents: write
+
+jobs:
+    call-workflow:
+        uses: SupKittyMeow/Wonky-Window/.github/workflows/build.yml@main
+        secrets: inherit
+        with:
+          version: ${{ inputs.tag }}
+
+    download-and-release:
+        needs: call-workflow
+        runs-on: ubuntu-latest
+        steps:
+            - name: Download macOS dmg
+              uses: actions/download-artifact@v6
+              with:
+                  name: wonky-window-macos
+                  path: ./artifacts
+
+            - name: Download Windows installer
+              uses: actions/download-artifact@v6
+              with:
+                  name: wonky-window-windows-installer
+                  path: ./artifacts
+
+            - name: Download Windows portable
+              uses: actions/download-artifact@v6
+              with:
+                  name: wonky-window-windows-portable
+                  path: ./windows_portable
+            - name: Zip Windows portable
+              run: zip -r ./artifacts/WonkyWindow-windows-portable-v${{ inputs.tag }}.zip ./windows_portable
+            - name: Download Linux build
+              uses: actions/download-artifact@v6
+              with:
+                name: wonky-window-linux
+                path: ./linux_build
+            - name: Zip Linux build
+              run: zip -r ./artifacts/WonkyWindow-linux-v${{ inputs.tag }}.zip ./linux_build
+            - name: Create draft release
+              uses: softprops/action-gh-release@v2
+              with:
+                draft: true
+                prerelease: ${{ inputs.prerelease }}
+                tag_name: v${{ inputs.tag }}
+                target_commitish: ${{ github.sha }}
+                generate_release_notes: true
+                files: ./artifacts/**
+                overwrite_files: true
