@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtWidgets import QApplication, QWidget, QSlider, QVBoxLayout, QLabel, QMenuBar, QMenu
+from PySide6.QtWidgets import QApplication, QWidget, QSlider, QVBoxLayout, QLabel
 from PySide6.QtGui import QCursor, QScreen, QWheelEvent
 from PySide6.QtCore import QTimer, QEvent, Qt
 from qframelesswindow import AcrylicWindow
@@ -30,7 +30,7 @@ class Window(AcrylicWindow):
         self.setTitleBar(QWidget()) # don't use self.titleBar.hide() here because this takes full screen and lets focus be IMMEDIATELY grabbed
 
         self.toggleStayOnTop()
-
+        
         self.hide_from_alt_tab()        
         
         # updating vars setup
@@ -98,7 +98,7 @@ class Window(AcrylicWindow):
         elif event.phase() == Qt.ScrollPhase.ScrollMomentum:
             event.accept()
         else: # hopefully a working fallback for devices that don't support scroll phases (mice, etc)
-            self.on_settings
+            self.on_settings()
             event.accept()
             
     def eventFilter(self, obj, event: QEvent):
