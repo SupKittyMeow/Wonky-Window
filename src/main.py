@@ -1,6 +1,6 @@
 import sys
 from PySide6.QtWidgets import QApplication, QWidget, QSlider, QVBoxLayout, QLabel
-from PySide6.QtGui import QCursor, QScreen, QWheelEvent
+from PySide6.QtGui import QCursor, QEnterEvent, QMouseEvent, QScreen, QWheelEvent
 from PySide6.QtCore import QTimer, QEvent, Qt
 from qframelesswindow import AcrylicWindow
 import time
@@ -49,6 +49,8 @@ class Window(AcrylicWindow):
         
         self.screen_width: int = self.screen().availableSize().width()
         self.screen_height: int = self.screen().availableSize().height()
+        
+        self.mouseOverSlider = False
 
         # spawning position
         cursorPos = QCursor.pos()
@@ -103,11 +105,11 @@ class Window(AcrylicWindow):
             
     def eventFilter(self, obj, event: QEvent):
         if event.type() == QEvent.Type.MouseButtonPress or event.type() == QEvent.Type.MouseButtonDblClick:
-            self.onMouseDown(event)
+            if not self.mouseOverSlider: self.onMouseDown(event)
         elif event.type() == QEvent.Type.MouseButtonRelease:
-            self.onMouseUp(event)
+            if not self.mouseOverSlider: self.onMouseUp(event)
         if event.type() == QEvent.Type.Close:
-            QApplication.quit()
+            self.state = 'closing'
         return False
 
     def onMouseDown(self, event):
@@ -186,9 +188,18 @@ class Window(AcrylicWindow):
         Args:
             QSlider (_type_): _description_
         """
-        def wheelEvent(self, event):
+        def wheelEvent(self, event: QWheelEvent):
             event.ignore()
-            # super().wheelEvent(event) 
+        
+        def enterEvent(self, event: QEnterEvent) -> None:
+            print('enter')
+            self.parent().mouseOverSlider = True # type: ignore
+            event.accept()
+            
+        def leaveEvent(self, event: QEnterEvent) -> None:
+            print('exit')
+            self.parent().mouseOverSlider = False # type: ignore
+            event.accept()
             
     def create_layout(self):
         self.new_layout = QVBoxLayout()
@@ -289,6 +300,7 @@ class Window(AcrylicWindow):
 
     def animate_settings_close(self, center_x, center_y, i: float = 0):
         if i < 4:
+            self.mouseOverSlider = False
             self.posX = center_x - (int(500-i*100)) / 2
             self.posY = center_y - (int(400-i*75) / 2)
             self.setFixedSize(int(500-i*100), (int(400-i*75)))
@@ -402,6 +414,10 @@ class Window(AcrylicWindow):
             self.posY = posY
 
     def update_physics(self):
+        if self.state == 'closing':
+            QApplication.quit()
+            return
+        
         if self.mouseDown:
             cursorPos = QCursor.pos()
             cursorX = cursorPos.x()

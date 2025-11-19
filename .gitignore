@@ -16,6 +16,7 @@ venv/
 # OS / editor junk
 .DS_Store
 Thumbs.db
+.vscode
 
 # Built stuff
 dist/*
