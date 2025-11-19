@@ -1,6 +1,6 @@
 import sys
-from PySide6.QtWidgets import QApplication, QWidget, QSlider, QVBoxLayout, QLabel
-from PySide6.QtGui import QCursor, QScreen
+from PySide6.QtWidgets import QApplication, QWidget, QSlider, QVBoxLayout, QLabel, QMenuBar, QMenu
+from PySide6.QtGui import QCursor, QScreen, QWheelEvent
 from PySide6.QtCore import QTimer, QEvent, Qt
 from qframelesswindow import AcrylicWindow
 import time
@@ -9,12 +9,11 @@ import os
 if (sys.platform == 'linux'):
     os.environ.setdefault('QT_QPA_PLATFORM', 'xcb')
 
-BOUNCE_FACTOR: int = 1
-GRAVITY: int = 5
-FRICTION: int = 3
-THROW_FACTOR: int = 2
-POP_FACTOR: int = 2
-FPS = 60
+BOUNCE_FACTOR: float = 0.8
+GRAVITY: float = 4.15
+FRICTION: float = 0.3
+THROW_POWER: float = 0.5
+POP_FACTOR: float = 2
 
 refresh_rate = 60
 
@@ -24,6 +23,7 @@ class Window(AcrylicWindow):
         # basic setup stuff
         super().__init__()
         self.setWindowTitle('Wonky Window')
+        
         self.setFixedSize(1, 1)
         self.setResizeEnabled(False)
 
@@ -50,8 +50,6 @@ class Window(AcrylicWindow):
         self.screen_width: int = self.screen().availableSize().width()
         self.screen_height: int = self.screen().availableSize().height()
 
-        self.hasBeenUnderMousePreviousFrame: bool = False
-
         # spawning position
         cursorPos = QCursor.pos()
         center_x: int = cursorPos.x() - 50 # subtracting 50, as this is half of the width of the window (center it instead of top left)
@@ -61,13 +59,15 @@ class Window(AcrylicWindow):
         self.posX = center_x
         self.posY = center_y
 
+        self.wasMouseDown = False
+        
         window = self.windowHandle()
         if window is not None:
             window.screenChanged.connect(self.screen_changed)
 
         self.screen_changed(self.screen())
 
-        self.state = 'loop'
+        self.state = 'spawn_animation'
 
         self.create_layout()
         
@@ -87,13 +87,25 @@ class Window(AcrylicWindow):
             user32.SetWindowLongPtrA(hwnd, GWL_EXSTYLE, new_style)
             user32.SetWindowPos(hwnd, 0, 0, 0, 0, 0, 0x0023)
 
+    def wheelEvent(self, event: QWheelEvent):
+        if event.phase() == Qt.ScrollPhase.ScrollBegin:
+            self.on_settings()
+            event.accept()
+        elif event.phase() == Qt.ScrollPhase.ScrollEnd:
+            event.accept()
+        elif event.phase() == Qt.ScrollPhase.ScrollUpdate:
+            event.accept()
+        elif event.phase() == Qt.ScrollPhase.ScrollMomentum:
+            event.accept()
+        else: # hopefully a working fallback for devices that don't support scroll phases (mice, etc)
+            self.on_settings
+            event.accept()
+            
     def eventFilter(self, obj, event: QEvent):
         if event.type() == QEvent.Type.MouseButtonPress or event.type() == QEvent.Type.MouseButtonDblClick:
             self.onMouseDown(event)
         elif event.type() == QEvent.Type.MouseButtonRelease:
             self.onMouseUp(event)
-        if event.type() == QEvent.Type.Wheel:
-            self.on_settings()
         if event.type() == QEvent.Type.Close:
             QApplication.quit()
         return False
@@ -132,7 +144,7 @@ class Window(AcrylicWindow):
                     distancesX.append(0)
                 i += 1
             i = 0
-            for frame in self.previousFramesY:
+            for _ in self.previousFramesY:
                 if i == 0:
                     i += 1
                     continue
@@ -142,36 +154,51 @@ class Window(AcrylicWindow):
                     distancesY.append(0)
                 i += 1
 
-            self.velX = sum(distancesX) / len(distancesX) / (THROW_FACTOR * 100)
-            self.velY = sum(distancesY) / len(distancesY) / (THROW_FACTOR * 100)
+            self.velX = sum(distancesX) / len(distancesX) * THROW_POWER / 100
+            self.velY = sum(distancesY) / len(distancesY) * THROW_POWER / 100
             
             self.mouseDown = False
     
     def on_gravity_change(self, value):
         global GRAVITY
+        if value == 0: GRAVITY = 0
         GRAVITY = value / 100
     def on_bounciness_change(self, value):
         global BOUNCE_FACTOR
+        if value == 0: BOUNCE_FACTOR = 0
         BOUNCE_FACTOR = value / 100
     def on_friction_change(self, value):
         global FRICTION
+        if value == 0: FRICTION = 0
         FRICTION = value / 100
     def on_throw_factor_change(self, value):
-        global THROW_FACTOR
-        THROW_FACTOR = value / 100
+        global THROW_POWER
+        if value == 0: THROW_POWER = 0
+        THROW_POWER = value / 100
     def on_pop_factor_change(self, value):
         global POP_FACTOR
+        if value == 0: POP_FACTOR = 0
         POP_FACTOR = value / 100
         
+    class BetterSlider(QSlider):
+        """A slider without scroll input.
+
+        Args:
+            QSlider (_type_): _description_
+        """
+        def wheelEvent(self, event):
+            event.ignore()
+            # super().wheelEvent(event) 
+            
     def create_layout(self):
         self.new_layout = QVBoxLayout()
-
+        
         self.gravity_layout = QVBoxLayout()
         self.gravity_layout.setContentsMargins(0, 0, 0, 30)
-        self.gravity = QSlider(Qt.Orientation.Horizontal)
-        self.gravity.setMinimum(1)
-        self.gravity.setMaximum(1000)
-        self.gravity.setValue(GRAVITY * 100)
+        self.gravity = self.BetterSlider(Qt.Orientation.Horizontal)
+        self.gravity.setMinimum(0)
+        self.gravity.setMaximum(3000)
+        self.gravity.setValue(int(GRAVITY * 100))
         self.gravity.valueChanged.connect(self.on_gravity_change)
         self.gravity_layout.addWidget(self.gravity)
 
@@ -182,10 +209,10 @@ class Window(AcrylicWindow):
 
         self.bounciness_layout = QVBoxLayout()
         self.bounciness_layout.setContentsMargins(0, 0, 0, 30)
-        self.bounciness = QSlider(Qt.Orientation.Horizontal)
-        self.bounciness.setMinimum(1)
-        self.bounciness.setMaximum(500)
-        self.bounciness.setValue(BOUNCE_FACTOR * 100)
+        self.bounciness = self.BetterSlider(Qt.Orientation.Horizontal)
+        self.bounciness.setMinimum(0)
+        self.bounciness.setMaximum(100)
+        self.bounciness.setValue(int(BOUNCE_FACTOR * 100))
         self.bounciness.valueChanged.connect(self.on_bounciness_change)
         self.bounciness_layout.addWidget(self.bounciness)
         
@@ -196,10 +223,10 @@ class Window(AcrylicWindow):
 
         self.friction_layout = QVBoxLayout()
         self.friction_layout.setContentsMargins(0, 0, 0, 30)
-        self.friction = QSlider(Qt.Orientation.Horizontal)
-        self.friction.setMinimum(1)
-        self.friction.setMaximum(500)
-        self.friction.setValue(FRICTION * 100)
+        self.friction = self.BetterSlider(Qt.Orientation.Horizontal)
+        self.friction.setMinimum(0)
+        self.friction.setMaximum(200)
+        self.friction.setValue(int(FRICTION * 100))
         self.friction.valueChanged.connect(self.on_friction_change)
         self.friction_layout.addWidget(self.friction)
         
@@ -210,10 +237,10 @@ class Window(AcrylicWindow):
 
         self.throw_layout = QVBoxLayout()
         self.throw_layout.setContentsMargins(0, 0, 0, 30)
-        self.throw = QSlider(Qt.Orientation.Horizontal)
-        self.throw.setMinimum(100)
-        self.throw.setMaximum(250)
-        self.throw.setValue(THROW_FACTOR * 100)
+        self.throw = self.BetterSlider(Qt.Orientation.Horizontal)
+        self.throw.setMinimum(0)
+        self.throw.setMaximum(300)
+        self.throw.setValue(int(THROW_POWER * 100))
         self.throw.valueChanged.connect(self.on_throw_factor_change)
         self.throw_layout.addWidget(self.throw)
         
@@ -234,85 +261,46 @@ class Window(AcrylicWindow):
         self.friction_label.show()
         self.throw.show()
         self.throw_label.show()
-            
-        self.hasBeenUnderMousePreviousFrame = False
-
-        self.slide_in_effect()
-
-    def slide_in_effect(self, scale=0):
-        if scale >= 450:
-            self.gravity.setFixedWidth(450)
-            self.friction.setFixedWidth(450)
-            self.bounciness.setFixedWidth(450)
-            self.throw.setFixedWidth(450)
-            return
-        
-        # Weird glitch if you go fast enough so show sliders every frame. TODO: fix better
-        self.gravity.show()
-        self.gravity_label.show()
-        self.bounciness.show()
-        self.bounciness_label.show()
-        self.friction.show()
-        self.friction_label.show()
-        self.throw.show()
-        self.throw_label.show()
-        
-        self.gravity.setFixedWidth(scale)
-        self.bounciness.setFixedWidth(scale)
-        self.friction.setFixedWidth(scale)
-        self.throw.setFixedWidth(scale)
-        QTimer.singleShot(16, lambda: self.slide_in_effect(scale+10))
     
-    def hide_sliders(self, scale=450):
-        if scale <= 0:
-            self.gravity.setFixedWidth(0)
-            self.friction.setFixedWidth(0)
-            self.bounciness.setFixedWidth(0)
-            self.throw.setFixedWidth(0)
-            self.gravity.hide()
-            self.gravity_label.hide()
-            self.bounciness.hide()
-            self.bounciness_label.hide()
-            self.friction.hide()
-            self.friction_label.hide()
-            self.throw.hide()
-            self.throw_label.hide()
-            return
-        self.gravity.setFixedWidth(scale)
-        self.bounciness.setFixedWidth(scale)
-        self.friction.setFixedWidth(scale)
-        self.throw.setFixedWidth(scale)
+    def hide_sliders(self):
+        self.gravity.hide()
+        self.gravity_label.hide()
+        self.bounciness.hide()
+        self.bounciness_label.hide()
+        self.friction.hide()
+        self.friction_label.hide()
+        self.throw.hide()
+        self.throw_label.hide()
 
-        QTimer.singleShot(16, lambda: self.hide_sliders(scale-10))
-
-    def animate_settings_open(self, center_x, center_y, i=0):
-        if i > -400:
-            self.posX = center_x + (100+i) / 2
-            self.posY = center_y + (100+i*.75) / 2
-            self.setFixedSize(int(100-i), (int(100-i*.75)))
+    def animate_settings_open(self, center_x, center_y, i: float = 0):
+        if i <= 4:
+            self.posX = center_x + (100-i*100) / 2
+            self.posY = center_y + (100-i*75) / 2
+            self.setFixedSize(int(100+i*100), (int(100+i*75)))
 
             current_time = time.perf_counter()
             delta_time = min(current_time - self.last_time, 0.05)
             self.last_time = current_time
             
-            QTimer.singleShot(16, lambda: self.animate_settings_open(center_x, center_y, i-int(500*delta_time)))
+            QTimer.singleShot(int(1000 / refresh_rate), lambda: self.animate_settings_open(center_x, center_y, i + (delta_time * 7.5)))
         else:
             self.setFixedSize(500, 400)
-            # self.update_physics()
             self.state = 'settings'
 
-    def animate_settings_close(self, center_x, center_y, i=0):
-        if i < 400:
-            self.posX = center_x - (int(500-i)) / 2
-            self.posY = center_y - (int(400-i*.75) / 2)
-            self.setFixedSize(int(500-i), (int(400-i*.75)))
+    def animate_settings_close(self, center_x, center_y, i: float = 0):
+        if i < 4:
+            self.posX = center_x - (int(500-i*100)) / 2
+            self.posY = center_y - (int(400-i*75) / 2)
+            self.setFixedSize(int(500-i*100), (int(400-i*75)))
+            
             current_time = time.perf_counter()
             delta_time = min(current_time - self.last_time, 0.05)
             self.last_time = current_time
-            QTimer.singleShot(16, lambda: self.animate_settings_close(center_x, center_y, i+int(500*delta_time)))
+            
+            QTimer.singleShot(int(1000 / refresh_rate), lambda: self.animate_settings_close(center_x, center_y, i + (delta_time * 7.5)))
         else:
+            # self.hide_sliders()
             self.setFixedSize(100, 100)
-            # self.update_physics()
             self.state = 'loop'
 
     def on_settings(self, i=1):
@@ -321,44 +309,47 @@ class Window(AcrylicWindow):
         self.velY = 0
         if self.state == 'loop':
             self.state = 'opening settings'
-            self.show_sliders()
             center_x = (self.posX + self.width() // 2) - 100
             center_y = (self.posY + self.height() // 2) - 100
+            self.show_sliders()
             self.animate_settings_open(center_x=center_x, center_y=center_y)
 
         elif self.state == 'settings':
             self.state = 'closing settings'
-            self.hide_sliders()
             center_x = (self.posX + self.width() // 2)
             center_y = (self.posY + self.height() // 2)
             self.animate_settings_close(center_x=center_x, center_y=center_y)
 
 
-    def spawn_animation(self, i=1):
+    def spawn_animation(self, i: float = 0.01):
+        self.state = 'spawn_animation'
         cursorPos = QCursor.pos()
         center_x = cursorPos.x() - 50 # subtracting 50, as this is half of the width of the window (center it instead of top left)
         center_y = cursorPos.y() - 50
 
-        self.move((center_x + 50) - i // 2, (center_y + 50) - i // 2)
-        self.setFixedSize(i, i)
+        self.move(int((center_x + 50) - (i * 100) / 2), int((center_y + 50) - (i * 100) / 2))
+        self.setFixedSize(int(i * 100), int(i * 100))
         
-        if i >= 100:
-            i = 100
+        current_time = time.perf_counter()
+        delta_time = min(current_time - self.last_time, 0.05)
+        self.last_time = current_time
+        
+        if i >= 1:
+            i = 1
             self.setFixedSize(100, 100)
             self.posX: float = self.x()
             self.posY: float = self.y()
-            QTimer.singleShot(16, self.update_physics)
+            self.state = 'loop'
+            QTimer.singleShot(int(1000 / refresh_rate), self.update_physics)
         else:
-            current_time = time.perf_counter()
-            delta_time = min(current_time - self.last_time, 0.05)
-            self.last_time = current_time
-            QTimer.singleShot(16, lambda: self.spawn_animation(i+int(250 * delta_time)))
+            QTimer.singleShot(int(1000 / refresh_rate), lambda: self.spawn_animation(i + (delta_time * 2)))
 
     def screen_changed(self, screen: QScreen):
+        global refresh_rate
+        refresh_rate = screen.refreshRate()
         self.geo = screen.availableGeometry()
 
     def check_window_collision(self):
-        print("check")
         if not self.mouseDown:
             self.screen_changed(self.screen())
             furthestLeft = self.geo.left()
@@ -367,29 +358,46 @@ class Window(AcrylicWindow):
             height = self.geo.bottom() - self.height()
             posX = self.posX
             posY = self.posY
+            oldVelX = self.velX
+            oldVelY = self.velY
+            didHitH = False
+            didHitV = False
             
             if posX < furthestLeft:
                 distance = (posX - furthestLeft) / POP_FACTOR
                 self.velX = (-self.velX * BOUNCE_FACTOR) + distance
                 posX = furthestLeft
+                didHitH = True
             elif posX > width:
                 distance = (posX - width) / POP_FACTOR
                 self.velX = (-self.velX * BOUNCE_FACTOR) + distance
+                didHitH = True
                 posX = width
 
             if posY > height:
                 distance = (posY - height) / POP_FACTOR
                 self.velY = (-self.velY * BOUNCE_FACTOR) + distance
+                didHitV = True
                 posY = height
                 if abs(self.velY) < 0.1:
                     self.velY = 0
             elif posY < furthestUp:
                 distance = (posY - furthestUp) / POP_FACTOR
                 self.velY = (-self.velY * BOUNCE_FACTOR) + distance
+                didHitV = True
                 posY = furthestUp
                 if abs(self.velY) < 0.1:
                     self.velY = 0
 
+            if not self.wasMouseDown:
+                if didHitH:
+                    self.velX = -oldVelX * BOUNCE_FACTOR
+                if didHitV:
+                    if abs(oldVelY) < 1:
+                        self.velY = 0
+                    else:
+                        self.velY = -oldVelY * BOUNCE_FACTOR
+                    
             self.posX = posX
             self.posY = posY
 
@@ -399,6 +407,8 @@ class Window(AcrylicWindow):
             cursorX = cursorPos.x()
             cursorY = cursorPos.y()
 
+            self.wasMouseDown = True
+            
             self.posX = cursorX + self.mouseOffsetX
             self.posY = cursorY + self.mouseOffsetY
 
@@ -415,8 +425,7 @@ class Window(AcrylicWindow):
                 self.last_time = current_time
                 
                 self.velY += GRAVITY * delta_time * self.screen().devicePixelRatio()
-                self.velX -= self.velX / FRICTION * delta_time * self.screen().devicePixelRatio()
-
+                self.velX -= self.velX * FRICTION * delta_time * self.screen().devicePixelRatio()
                 self.posX += self.velX
                 self.posY += self.velY
 
@@ -426,6 +435,7 @@ class Window(AcrylicWindow):
                     if abs(self.velX) < 0.025:
                         self.velX = 0
                     self.check_window_collision()
+                    self.wasMouseDown = False
         self.move(int(self.posX), int(self.posY))
         QTimer.singleShot(int(1000/refresh_rate), self.update_physics)
 
