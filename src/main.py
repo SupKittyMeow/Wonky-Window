@@ -69,6 +69,8 @@ class Window(AcrylicWindow):
 
         self.state = 'loop'
 
+        self.create_layout()
+        
         # start the spawning anim!
         self.spawn_animation()
     
@@ -85,7 +87,7 @@ class Window(AcrylicWindow):
             user32.SetWindowLongPtrA(hwnd, GWL_EXSTYLE, new_style)
             user32.SetWindowPos(hwnd, 0, 0, 0, 0, 0, 0x0023)
 
-    def eventFilter(self, obj, event):
+    def eventFilter(self, obj, event: QEvent):
         if event.type() == QEvent.Type.MouseButtonPress or event.type() == QEvent.Type.MouseButtonDblClick:
             self.onMouseDown(event)
         elif event.type() == QEvent.Type.MouseButtonRelease:
@@ -156,20 +158,12 @@ class Window(AcrylicWindow):
         FRICTION = value / 100
     def on_throw_factor_change(self, value):
         global THROW_FACTOR
-        THROW_FACTOR = (400-value) / 100
+        THROW_FACTOR = value / 100
     def on_pop_factor_change(self, value):
         global POP_FACTOR
         POP_FACTOR = value / 100
         
-    def show_sliders(self):
-        self.hasBeenUnderMousePreviousFrame = False
-
-        global GRAVITY
-        global BOUNCE_FACTOR
-        global FRICTION
-        global THROW_FACTOR
-        global POP_FACTOR
-
+    def create_layout(self):
         self.new_layout = QVBoxLayout()
 
         self.gravity_layout = QVBoxLayout()
@@ -205,7 +199,7 @@ class Window(AcrylicWindow):
         self.friction = QSlider(Qt.Orientation.Horizontal)
         self.friction.setMinimum(1)
         self.friction.setMaximum(500)
-        self.friction.setValue(BOUNCE_FACTOR * 100)
+        self.friction.setValue(FRICTION * 100)
         self.friction.valueChanged.connect(self.on_friction_change)
         self.friction_layout.addWidget(self.friction)
         
@@ -230,38 +224,66 @@ class Window(AcrylicWindow):
         
         self.new_layout.setSpacing(10)
         self.setLayout(self.new_layout)
+
+    def show_sliders(self):
+        self.gravity.show()
+        self.gravity_label.show()
+        self.bounciness.show()
+        self.bounciness_label.show()
+        self.friction.show()
+        self.friction_label.show()
+        self.throw.show()
+        self.throw_label.show()
+            
+        self.hasBeenUnderMousePreviousFrame = False
+
         self.slide_in_effect()
 
-    def slide_in_effect(self, scale=0.0):
-        if scale >= 300:
-            self.gravity.setFixedWidth(300)
-            self.friction.setFixedWidth(300)
-            self.bounciness.setFixedWidth(300)
-            self.throw.setFixedWidth(300)
+    def slide_in_effect(self, scale=0):
+        if scale >= 450:
+            self.gravity.setFixedWidth(450)
+            self.friction.setFixedWidth(450)
+            self.bounciness.setFixedWidth(450)
+            self.throw.setFixedWidth(450)
             return
-        self.gravity.setFixedWidth(int(scale))
-        self.bounciness.setFixedWidth(int(scale))
-        self.friction.setFixedWidth(int(scale))
-        self.throw.setFixedWidth(int(scale))
-        QTimer.singleShot(16, lambda: self.slide_in_effect(scale+32))
+        
+        # Weird glitch if you go fast enough so show sliders every frame. TODO: fix better
+        self.gravity.show()
+        self.gravity_label.show()
+        self.bounciness.show()
+        self.bounciness_label.show()
+        self.friction.show()
+        self.friction_label.show()
+        self.throw.show()
+        self.throw_label.show()
+        
+        self.gravity.setFixedWidth(scale)
+        self.bounciness.setFixedWidth(scale)
+        self.friction.setFixedWidth(scale)
+        self.throw.setFixedWidth(scale)
+        QTimer.singleShot(16, lambda: self.slide_in_effect(scale+10))
     
-    def hide_sliders(self, scale=300):
+    def hide_sliders(self, scale=450):
         if scale <= 0:
-            self.gravity.destroy()
-            self.gravity_label.destroy()
-            self.bounciness.destroy()
-            self.bounciness_label.destroy()
-            self.friction.destroy()
-            self.friction_label.destroy()
-            self.throw.destroy()
-            self.throw_label.destroy()
+            self.gravity.setFixedWidth(0)
+            self.friction.setFixedWidth(0)
+            self.bounciness.setFixedWidth(0)
+            self.throw.setFixedWidth(0)
+            self.gravity.hide()
+            self.gravity_label.hide()
+            self.bounciness.hide()
+            self.bounciness_label.hide()
+            self.friction.hide()
+            self.friction_label.hide()
+            self.throw.hide()
+            self.throw_label.hide()
             return
         self.gravity.setFixedWidth(scale)
         self.bounciness.setFixedWidth(scale)
         self.friction.setFixedWidth(scale)
         self.throw.setFixedWidth(scale)
 
-        QTimer.singleShot(16, lambda: self.hide_sliders(scale-32))
+        QTimer.singleShot(16, lambda: self.hide_sliders(scale-10))
 
     def animate_settings_open(self, center_x, center_y, i=0):
         if i > -400:
@@ -276,7 +298,7 @@ class Window(AcrylicWindow):
             QTimer.singleShot(16, lambda: self.animate_settings_open(center_x, center_y, i-int(500*delta_time)))
         else:
             self.setFixedSize(500, 400)
-            self.update_physics()
+            # self.update_physics()
             self.state = 'settings'
 
     def animate_settings_close(self, center_x, center_y, i=0):
@@ -290,7 +312,7 @@ class Window(AcrylicWindow):
             QTimer.singleShot(16, lambda: self.animate_settings_close(center_x, center_y, i+int(500*delta_time)))
         else:
             self.setFixedSize(100, 100)
-            self.update_physics()
+            # self.update_physics()
             self.state = 'loop'
 
     def on_settings(self, i=1):
@@ -336,6 +358,7 @@ class Window(AcrylicWindow):
         self.geo = screen.availableGeometry()
 
     def check_window_collision(self):
+        print("check")
         if not self.mouseDown:
             self.screen_changed(self.screen())
             furthestLeft = self.geo.left()
