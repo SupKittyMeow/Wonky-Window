@@ -1,6 +1,6 @@
 import sys
 from PySide6.QtWidgets import QApplication, QWidget, QSlider, QVBoxLayout, QLabel
-from PySide6.QtGui import QCursor, QEnterEvent, QMouseEvent, QScreen, QWheelEvent
+from PySide6.QtGui import QCursor, QEnterEvent, QScreen, QWheelEvent
 from PySide6.QtCore import QTimer, QEvent, Qt
 from qframelesswindow import AcrylicWindow
 import time
