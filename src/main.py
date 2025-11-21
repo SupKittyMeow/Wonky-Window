@@ -2,7 +2,7 @@ import sys
 from PySide6.QtWidgets import QApplication, QWidget, QSlider, QVBoxLayout, QComboBox, QLabel
 from PySide6.QtGui import QCursor, QEnterEvent, QScreen, QWheelEvent
 from PySide6.QtCore import QTimer, QEvent, Qt
-from qframelesswindow import FramelessWindow
+from qframelesswindow import AcrylicWindow
 import time
 import os
 
@@ -16,12 +16,14 @@ THROW_POWER: float = 0.5
 POP_FACTOR: float = 2
 
 refresh_rate = 60
+isBlurred = True
 
 # Class to handle the window stuff, such as the event handling and the settings stuff
-class Window(FramelessWindow):
-    def __init__(self):        
+class Window(AcrylicWindow):
+    def __init__(self):
         # basic setup stuff
         super().__init__()
+    
         self.setWindowTitle('Wonky Window')
         
         self.setFixedSize(1, 1)
@@ -31,9 +33,7 @@ class Window(FramelessWindow):
 
         self.toggleStayOnTop()
         
-        self.hide_from_alt_tab()        
-
-        self.setWindowOpacity(0.8)
+        self.hide_from_alt_tab()
         
         # updating vars setup
         self.last_time: float = time.perf_counter()
@@ -74,10 +74,25 @@ class Window(FramelessWindow):
         self.state = 'spawn_animation'
 
         self.create_layout()
+
+        self.setAcrylicEffectEnabled(False, 0.8)
         
         # start the spawning anim!
         self.spawn_animation()
     
+    def setAcrylicEffectEnabled(self, enable: bool, opacity=1.0):
+        """ set acrylic effect enabled """
+        self.setStyleSheet(f"background:{'transparent' if enable else "#1e1f1f"}")
+        self.setWindowOpacity(opacity)
+        
+        if enable:
+            self.windowEffect.setAcrylicEffect(self.winId(), "7D7D7D")
+            # self.windowEffect.removeShadowEffect(self.winId())
+        else:
+            self.windowEffect.setAcrylicEffect(self.winId(), "7D7D7D")
+            # self.windowEffect.removeShadowEffect(self.winId())
+            self.windowEffect.removeBackgroundEffect(self.winId())
+
     def hide_from_alt_tab(self):
         if sys.platform == 'win32':
             import ctypes
@@ -175,6 +190,7 @@ class Window(FramelessWindow):
         global FRICTION
         if value == 0: FRICTION = 0
         FRICTION = value / 100
+        
     def on_throw_factor_change(self, value):
         global THROW_POWER
         if value == 0: THROW_POWER = 0
@@ -183,8 +199,18 @@ class Window(FramelessWindow):
         global POP_FACTOR
         if value == 0: POP_FACTOR = 0
         POP_FACTOR = value / 100
+        
     def on_blur_changed(self, value):
-        print('TODO: add')
+        if value == 0:
+            self.setAcrylicEffectEnabled(False, 0.8)
+        elif value == 1:
+            self.setAcrylicEffectEnabled(True)
+        else:
+            self.setAcrylicEffectEnabled(False, 1)
+            
+        # 0 = default
+        # 1 = blurred
+        # 2 = solid
         
     class BetterSlider(QSlider):
         """A slider without scroll input.
@@ -265,7 +291,7 @@ class Window(FramelessWindow):
         self.blur_layout = QVBoxLayout()
         self.blur_layout.setContentsMargins(0, 0, 0, 30)
         self.blur = QComboBox()
-        self.blur.addItem("Transparent (Default)")
+        self.blur.addItem("Translucent (Default)")
         self.blur.addItem("Blurred (WARNING: Can be laggy)")
         self.blur.addItem("Solid")
         
