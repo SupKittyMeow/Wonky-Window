@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtWidgets import QApplication, QWidget, QSlider, QVBoxLayout, QComboBox, QLabel
+from PySide6.QtWidgets import QApplication, QWidget, QSlider, QVBoxLayout, QComboBox, QLabel, QFrame
 from PySide6.QtGui import QCursor, QEnterEvent, QScreen, QWheelEvent
 from PySide6.QtCore import QTimer, QEvent, Qt
 from qframelesswindow import AcrylicWindow
@@ -28,8 +28,6 @@ class Window(AcrylicWindow):
         
         self.setFixedSize(1, 1)
         self.setResizeEnabled(False)
-
-        self.setTitleBar(QWidget()) # don't use self.titleBar.hide() here because this takes full screen and lets focus be IMMEDIATELY grabbed
 
         self.toggleStayOnTop()
         
@@ -77,6 +75,8 @@ class Window(AcrylicWindow):
 
         self.setAcrylicEffectEnabled(False, 0.8)
         
+        self.setTitleBar(QWidget()) # don't use self.titleBar.hide() here because this takes full screen and lets focus be IMMEDIATELY grabbed
+
         # start the spawning anim!
         self.spawn_animation()
     
@@ -231,7 +231,7 @@ class Window(AcrylicWindow):
             
     def create_layout(self):
         self.new_layout = QVBoxLayout()
-        
+
         self.gravity_layout = QVBoxLayout()
         self.gravity_layout.setContentsMargins(0, 0, 0, 30)
         self.gravity = self.BetterSlider(Qt.Orientation.Horizontal)
@@ -242,6 +242,7 @@ class Window(AcrylicWindow):
         self.gravity_layout.addWidget(self.gravity)
 
         self.gravity_label = QLabel('Gravity')
+
         self.gravity_layout.addWidget(self.gravity_label)
 
         self.new_layout.addLayout(self.gravity_layout)

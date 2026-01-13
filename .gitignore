@@ -24,3 +24,6 @@ build/*
 output/*
 *.p12
 version_info.txt
+
+# I have no idea
+.history
