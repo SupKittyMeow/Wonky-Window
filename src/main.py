@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtWidgets import QApplication, QWidget, QSlider, QVBoxLayout, QLabel
+from PySide6.QtWidgets import QApplication, QWidget, QSlider, QVBoxLayout, QComboBox, QLabel, QFrame
 from PySide6.QtGui import QCursor, QEnterEvent, QScreen, QWheelEvent
 from PySide6.QtCore import QTimer, QEvent, Qt
 from qframelesswindow import AcrylicWindow
@@ -16,22 +16,22 @@ THROW_POWER: float = 0.5
 POP_FACTOR: float = 2
 
 refresh_rate = 60
+isBlurred = True
 
 # Class to handle the window stuff, such as the event handling and the settings stuff
 class Window(AcrylicWindow):
-    def __init__(self):        
+    def __init__(self):
         # basic setup stuff
         super().__init__()
+    
         self.setWindowTitle('Wonky Window')
         
         self.setFixedSize(1, 1)
         self.setResizeEnabled(False)
 
-        self.setTitleBar(QWidget()) # don't use self.titleBar.hide() here because this takes full screen and lets focus be IMMEDIATELY grabbed
-
         self.toggleStayOnTop()
         
-        self.hide_from_alt_tab()        
+        self.hide_from_alt_tab()
         
         # updating vars setup
         self.last_time: float = time.perf_counter()
@@ -72,10 +72,27 @@ class Window(AcrylicWindow):
         self.state = 'spawn_animation'
 
         self.create_layout()
+
+        self.setAcrylicEffectEnabled(False, 0.8)
         
+        self.setTitleBar(QWidget()) # don't use self.titleBar.hide() here because this takes full screen and lets focus be IMMEDIATELY grabbed
+
         # start the spawning anim!
         self.spawn_animation()
     
+    def setAcrylicEffectEnabled(self, enable: bool, opacity=1.0):
+        """ set acrylic effect enabled """
+        self.setStyleSheet(f"background:{'transparent' if enable else "#1e1f1f"}")
+        self.setWindowOpacity(opacity)
+        
+        if enable:
+            self.windowEffect.setAcrylicEffect(self.winId(), "7D7D7D")
+            # self.windowEffect.removeShadowEffect(self.winId())
+        else:
+            self.windowEffect.setAcrylicEffect(self.winId(), "7D7D7D")
+            # self.windowEffect.removeShadowEffect(self.winId())
+            self.windowEffect.removeBackgroundEffect(self.winId())
+
     def hide_from_alt_tab(self):
         if sys.platform == 'win32':
             import ctypes
@@ -173,6 +190,7 @@ class Window(AcrylicWindow):
         global FRICTION
         if value == 0: FRICTION = 0
         FRICTION = value / 100
+        
     def on_throw_factor_change(self, value):
         global THROW_POWER
         if value == 0: THROW_POWER = 0
@@ -181,6 +199,18 @@ class Window(AcrylicWindow):
         global POP_FACTOR
         if value == 0: POP_FACTOR = 0
         POP_FACTOR = value / 100
+        
+    def on_blur_changed(self, value):
+        if value == 0:
+            self.setAcrylicEffectEnabled(False, 0.8)
+        elif value == 1:
+            self.setAcrylicEffectEnabled(True)
+        else:
+            self.setAcrylicEffectEnabled(False, 1)
+            
+        # 0 = default
+        # 1 = blurred
+        # 2 = solid
         
     class BetterSlider(QSlider):
         """A slider without scroll input.
@@ -192,18 +222,16 @@ class Window(AcrylicWindow):
             event.ignore()
         
         def enterEvent(self, event: QEnterEvent) -> None:
-            print('enter')
             self.parent().mouseOverSlider = True # type: ignore
             event.accept()
             
         def leaveEvent(self, event: QEnterEvent) -> None:
-            print('exit')
             self.parent().mouseOverSlider = False # type: ignore
             event.accept()
             
     def create_layout(self):
         self.new_layout = QVBoxLayout()
-        
+
         self.gravity_layout = QVBoxLayout()
         self.gravity_layout.setContentsMargins(0, 0, 0, 30)
         self.gravity = self.BetterSlider(Qt.Orientation.Horizontal)
@@ -214,6 +242,7 @@ class Window(AcrylicWindow):
         self.gravity_layout.addWidget(self.gravity)
 
         self.gravity_label = QLabel('Gravity')
+
         self.gravity_layout.addWidget(self.gravity_label)
 
         self.new_layout.addLayout(self.gravity_layout)
@@ -260,6 +289,21 @@ class Window(AcrylicWindow):
         
         self.new_layout.addLayout(self.throw_layout)
         
+        self.blur_layout = QVBoxLayout()
+        self.blur_layout.setContentsMargins(0, 0, 0, 30)
+        self.blur = QComboBox()
+        self.blur.addItem("Translucent (Default)")
+        self.blur.addItem("Blurred (WARNING: Can be laggy)")
+        self.blur.addItem("Solid")
+        
+        self.blur.currentIndexChanged.connect(self.on_blur_changed)
+        self.blur_layout.addWidget(self.blur)
+        
+        self.blur_label = QLabel('Blur type')
+        self.blur_layout.addWidget(self.blur_label)
+        
+        self.new_layout.addLayout(self.blur_layout)
+        
         self.new_layout.setSpacing(10)
         self.setLayout(self.new_layout)
 
@@ -272,6 +316,8 @@ class Window(AcrylicWindow):
         self.friction_label.show()
         self.throw.show()
         self.throw_label.show()
+        self.blur.show()
+        self.blur_label.show()
     
     def hide_sliders(self):
         self.gravity.hide()
@@ -282,12 +328,14 @@ class Window(AcrylicWindow):
         self.friction_label.hide()
         self.throw.hide()
         self.throw_label.hide()
+        self.blur.hide()
+        self.blur_label.hide()
 
     def animate_settings_open(self, center_x, center_y, i: float = 0):
         if i <= 4:
             self.posX = center_x + (100-i*100) / 2
-            self.posY = center_y + (100-i*75) / 2
-            self.setFixedSize(int(100+i*100), (int(100+i*75)))
+            self.posY = center_y + (100-i*100) / 2
+            self.setFixedSize(int(100+i*100), (int(100+i*100)))
 
             current_time = time.perf_counter()
             delta_time = min(current_time - self.last_time, 0.05)
@@ -295,15 +343,15 @@ class Window(AcrylicWindow):
             
             QTimer.singleShot(int(1000 / refresh_rate), lambda: self.animate_settings_open(center_x, center_y, i + (delta_time * 7.5)))
         else:
-            self.setFixedSize(500, 400)
+            self.setFixedSize(500, 500)
             self.state = 'settings'
 
     def animate_settings_close(self, center_x, center_y, i: float = 0):
         if i < 4:
             self.mouseOverSlider = False
             self.posX = center_x - (int(500-i*100)) / 2
-            self.posY = center_y - (int(400-i*75) / 2)
-            self.setFixedSize(int(500-i*100), (int(400-i*75)))
+            self.posY = center_y - (int(500-i*100) / 2)
+            self.setFixedSize(int(500-i*100), (int(500-i*100)))
             
             current_time = time.perf_counter()
             delta_time = min(current_time - self.last_time, 0.05)
@@ -363,7 +411,6 @@ class Window(AcrylicWindow):
 
     def check_window_collision(self):
         if not self.mouseDown:
-            self.screen_changed(self.screen())
             furthestLeft = self.geo.left()
             furthestUp = self.geo.top()
             width = self.geo.right() - self.width()
@@ -452,8 +499,11 @@ class Window(AcrylicWindow):
                         self.velX = 0
                     self.check_window_collision()
                     self.wasMouseDown = False
-        self.move(int(self.posX), int(self.posY))
-        QTimer.singleShot(int(1000/refresh_rate), self.update_physics)
+        if not (self.velX == 0 and self.velY == 0) or self.mouseDown or self.state != 'loop': # optimization to prevent redrawing EVERY SINGLE FRAME even if it hasn't moved
+            self.move(int(self.posX), int(self.posY))
+            QTimer.singleShot(int(1000/refresh_rate), self.update_physics)
+        else:
+            QTimer.singleShot(int(10000/refresh_rate), self.update_physics)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
