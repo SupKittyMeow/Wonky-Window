@@ -29,6 +29,9 @@ class Window(AcrylicWindow):
         self.setFixedSize(1, 1)
         self.setResizeEnabled(False)
 
+        self.window_widget = QWidget()
+        self.setTitleBar(self.window_widget) # don't use self.titleBar.hide() here because this takes full screen and lets focus be IMMEDIATELY grabbed
+
         self.toggleStayOnTop()
         
         self.hide_from_alt_tab()
@@ -74,8 +77,6 @@ class Window(AcrylicWindow):
         self.create_layout()
 
         self.setAcrylicEffectEnabled(False, 0.8)
-        
-        self.setTitleBar(QWidget()) # don't use self.titleBar.hide() here because this takes full screen and lets focus be IMMEDIATELY grabbed
 
         # start the spawning anim!
         self.spawn_animation()
@@ -359,7 +360,7 @@ class Window(AcrylicWindow):
             
             QTimer.singleShot(int(1000 / refresh_rate), lambda: self.animate_settings_close(center_x, center_y, i + (delta_time * 7.5)))
         else:
-            # self.hide_sliders()
+            self.hide_sliders()
             self.setFixedSize(100, 100)
             self.state = 'loop'
 
