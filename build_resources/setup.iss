@@ -5,8 +5,8 @@
 #ifndef MyAppVersion
   #define MyAppVersion "1.0.0"
 #endif
-#define MyAppPublisher "SupKittyMeow"
-#define MyAppURL "https://github.com/SupKittyMeow/Wonky-Window"
+#define MyAppPublisher "Precontation"
+#define MyAppURL "https://github.com/Precontation/Wonky-Window"
 #define MyAppExeName "Wonky Window.exe"
 #define MyOutputName "WonkyWindow-windows-installer"
 
