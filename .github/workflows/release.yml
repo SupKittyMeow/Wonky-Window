@@ -20,7 +20,7 @@ permissions:
 
 jobs:
     call-workflow:
-        uses: SupKittyMeow/Wonky-Window/.github/workflows/build.yml@main
+        uses: Precontation/Wonky-Window/.github/workflows/build.yml@main
         secrets: inherit
         with:
           version: ${{ inputs.tag }}
