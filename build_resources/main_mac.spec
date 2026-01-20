@@ -28,7 +28,7 @@ app = BUNDLE(
     coll,
     name='Wonky Window.app',
     icon='../src/logos/icons.icns',
-    bundle_identifier='com.supkittymeow.wonkywindow',
+    bundle_identifier='com.precontation.wonkywindow',
     info_plist={
         'CFBundleDisplayName': 'Wonky Window',
         'CFBundleName': 'Wonky Window',
