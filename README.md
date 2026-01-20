@@ -1,5 +1,5 @@
 # Wonky Window
-[![Downloads](https://img.shields.io/github/downloads/SupKittyMeow/Wonky-Window/total.svg)](https://github.com/SupKittyMeow/Wonky-Window/releases)
+[![Downloads](https://img.shields.io/github/downloads/Precontation/Wonky-Window/total.svg)](https://github.com/Precontation/Wonky-Window/releases)
 
 An open-source, cross-platform fidget for your computer.
 
@@ -13,7 +13,7 @@ An open-source, cross-platform fidget for your computer.
 5. Small and simple enough that nobody will notice if you are using it when you should be doing literally anything else
 
 ## Installation
-Get the newest release [here](https://github.com/SupKittyMeow/Wonky-Window/releases/latest).
+Get the newest release [here](https://github.com/Precontation/Wonky-Window/releases/latest).
 
 Pre-releases are newer, and while they usually aren't that buggy, they _can_ have more bugs, less features, or something else completely.
 
@@ -29,7 +29,7 @@ No. No it isnt.
 (seriously i have no idea how to code spyware)
 
 ## Star History
-[![Star History Chart](https://api.star-history.com/svg?repos=SupKittyMeow/Wonky-Window&type=date&legend=top-left)](https://www.star-history.com/#SupKittyMeow/Wonky-Window&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=Precontation/Wonky-Window&type=date&legend=top-left)](https://www.star-history.com/#Precontation/Wonky-Window&type=date&legend=top-left)
 
 when i made this (and probably still now but who knows) theres like 0 stars so its just a blank graph lol
 
@@ -38,4 +38,4 @@ While this software used to be under the MIT license, I realised that since I'm 
 
 Wonky Window is licensed under [GPLv3](./LICENSE)
 
-Copyright © 2025 by SupKittyMeow.
+Copyright © 2025 by Precontation.
