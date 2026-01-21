@@ -1,4 +1,5 @@
 PySide6==6.10.1
 PySideSix-Frameless-Window==0.7.4
 pyinstaller==6.17.0
-pyinstaller-hooks-contrib
+pyinstaller-hooks-contrib==2025.11
+numpy==2.4.1

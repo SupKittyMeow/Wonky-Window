@@ -1,10 +1,11 @@
 import sys
 from PySide6.QtWidgets import QApplication, QWidget, QSlider, QVBoxLayout, QComboBox, QLabel, QFrame
 from PySide6.QtGui import QCursor, QEnterEvent, QScreen, QWheelEvent
-from PySide6.QtCore import QTimer, QEvent, Qt
+from PySide6.QtCore import QTimer, QEvent, Qt, QPoint
 from qframelesswindow import AcrylicWindow
 import time
 import os
+import numpy as np
 
 if (sys.platform == 'linux'):
     os.environ.setdefault('QT_QPA_PLATFORM', 'xcb')
@@ -20,7 +21,7 @@ isBlurred = True
 
 # Class to handle the window stuff, such as the event handling and the settings stuff
 class Window(AcrylicWindow):
-    def __init__(self):
+    def __init__(self, winIndex=0, maxWins=1):
         # basic setup stuff
         super().__init__()
     
@@ -54,11 +55,14 @@ class Window(AcrylicWindow):
         self.screen_height: int = self.screen().availableSize().height()
         
         self.mouseOverSlider = False
-
+        
+        self.winIndex = winIndex
+        self.maxWins = maxWins
+        
         # spawning position
         cursorPos = QCursor.pos()
-        center_x: int = cursorPos.x() - 50 # subtracting 50, as this is half of the width of the window (center it instead of top left)
-        center_y: int = cursorPos.y() - 50
+        center_x: int = (cursorPos.x() - 50) + ((winIndex-maxWins*2) * 110)
+        center_y: int = (cursorPos.y() - 50) # subtracting 50, as this is half of the width of the window (center it instead of top left)
 
         self.move(center_x, center_y)
         self.posX = center_x
@@ -385,10 +389,10 @@ class Window(AcrylicWindow):
     def spawn_animation(self, i: float = 0.01):
         self.state = 'spawn_animation'
         cursorPos = QCursor.pos()
-        center_x = cursorPos.x() - 50 # subtracting 50, as this is half of the width of the window (center it instead of top left)
+        center_x: int = (cursorPos.x() - 50)
         center_y = cursorPos.y() - 50
 
-        self.move(int((center_x + 50) - (i * 100) / 2), int((center_y + 50) - (i * 100) / 2))
+        self.move(int((center_x + 50) + ((self.winIndex-self.maxWins*2) * 150) - (i * 100) / 2), int((center_y + 50) - (i * 100) / 2))
         self.setFixedSize(int(i * 100), int(i * 100))
         
         current_time = time.perf_counter()
@@ -461,6 +465,48 @@ class Window(AcrylicWindow):
             self.posX = posX
             self.posY = posY
 
+    def collision_with_other_window(self, coll: Window):
+        dx = (self.posX + self.size().width() / 2) - (coll.posX + coll.size().width() / 2)
+        dy = (self.posY + self.size().height() / 2) - (coll.posY + coll.size().height() / 2)
+        overlapX = ((self.size().width() / 2) + (coll.size().width() / 2)) - abs(dx)
+        overlapY = ((self.size().height() / 2) + (coll.size().height() / 2)) - abs(dy)
+        collision_normal = (0, 0)
+        if overlapX < overlapY: # More overlapped on horizontal than vertical, meaning flip on vertical
+            if dx == 0:
+                dx = 1 # Fallback
+            collision_normal = (np.sign(dx), 0)
+        else:
+            if dy == 0:
+                dy = 1 # Fallback
+            collision_normal = (0, np.sign(dy))
+
+        speed_along_normal = np.dot((self.velX, self.velY), collision_normal) # Velocity scalar
+        velocity_along_normal = np.array([collision_normal[0] * speed_along_normal, collision_normal[1] * speed_along_normal]) # Projected velocity vector along normal
+        tangent_velocity = np.array((self.velX, self.velY)) - velocity_along_normal # Perpendicular velocity vector along normal
+        self.velX = tangent_velocity[0]
+        self.velY = tangent_velocity[1]
+
+    def do_velocity_stuff(self):
+        current_time = time.perf_counter()
+        delta_time = min(current_time - self.last_time, 0.05)
+        self.last_time = current_time
+        
+        self.velY += GRAVITY * delta_time * self.screen().devicePixelRatio()
+        self.velX -= self.velX * FRICTION * delta_time * self.screen().devicePixelRatio()
+        self.posX += self.velX
+        self.posY += self.velY
+
+    def do_move_stuff(self):
+        if self.state == 'loop':
+                    if not (self.x() == int(self.posX) and self.y() == int(self.posY)):
+                        if not self.mouseDown:
+                            if abs(self.velX) < 0.025:
+                                self.velX = 0
+                            self.check_window_collision()
+                            self.wasMouseDown = False
+        if not (self.velX == 0 and self.velY == 0) or self.mouseDown or self.state != 'loop': # optimization to prevent redrawing EVERY SINGLE FRAME even if it hasn't moved
+            self.move(int(self.posX), int(self.posY))
+
     def update_physics(self):
         if self.state == 'closing':
             QApplication.quit()
@@ -484,36 +530,56 @@ class Window(AcrylicWindow):
             self.previousTimestamps.pop(0)
         else:
             if self.state == 'loop':
-                current_time = time.perf_counter()
-                delta_time = min(current_time - self.last_time, 0.05)
-                self.last_time = current_time
-                
-                self.velY += GRAVITY * delta_time * self.screen().devicePixelRatio()
-                self.velX -= self.velX * FRICTION * delta_time * self.screen().devicePixelRatio()
-                self.posX += self.velX
-                self.posY += self.velY
+                self.do_velocity_stuff()
 
-        if self.state == 'loop':
-            if not (self.x() == int(self.posX) and self.y() == int(self.posY)):
-                if not self.mouseDown:
-                    if abs(self.velX) < 0.025:
-                        self.velX = 0
-                    self.check_window_collision()
-                    self.wasMouseDown = False
-        if not (self.velX == 0 and self.velY == 0) or self.mouseDown or self.state != 'loop': # optimization to prevent redrawing EVERY SINGLE FRAME even if it hasn't moved
-            self.move(int(self.posX), int(self.posY))
-            QTimer.singleShot(int(1000/refresh_rate), self.update_physics)
-        else:
-            QTimer.singleShot(int(10000/refresh_rate), self.update_physics)
+        self.do_move_stuff()
+
+def collide_window_logic(fw: Window, sw: Window):
+    # Top left collision
+    fwS = fw.size().width()
+
+    swS = sw.size().width() / 2
+    swPos = sw.pos()
+    swPos.setX(swPos.x() + int(swS))
+    swPos.setY(swPos.y() - int(swS))
+
+    
+    tl = QPoint(int(fw.posX), int(fw.posY))
+    bl = QPoint(int(fw.posX), int(fw.posY + fwS))
+    tr = QPoint(int(fw.posX + fwS), int(fw.posY))
+    br = QPoint(int(fw.posX), int(fw.posY - fwS))
+
+    corners = [tl, bl, tr, bl, br]
+    for corner in corners:
+        if abs(corner.x() - swPos.x()) < swS: # Check collision horizontal
+            if abs(corner.y() - swPos.y()) < swS: # Check collision vertical
+                fw.collision_with_other_window(sw)
+                sw.collision_with_other_window(fw)
+
+def loop_window_check():
+    i = 0
+    for win in wins:
+        win.update_physics()
+        j = 0
+        for collision in wins:
+            if j <= i:
+                j += 1
+                continue
+            else:
+                collide_window_logic(win, collision)
+            j += 1
+        i += 1
+    QTimer.singleShot(16, loop_window_check)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     refresh_rate = app.primaryScreen().refreshRate()
 
     wins: list[Window] = []
-    for _ in range(1): # change this number to have different number of windows
-        wins.append(Window())
+    for i in range(5): # change this number to have different number of windows
+        wins.append(Window(i))
     for win in wins:
         win.show()
         win.installEventFilter(win)
+    loop_window_check()
     app.exec()
