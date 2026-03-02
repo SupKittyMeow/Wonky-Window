@@ -30,26 +30,26 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Download macOS dmg
-              uses: actions/download-artifact@v7
+              uses: actions/download-artifact@v8
               with:
                   name: wonky-window-macos
                   path: ./artifacts
 
             - name: Download Windows installer
-              uses: actions/download-artifact@v7
+              uses: actions/download-artifact@v8
               with:
                   name: wonky-window-windows-installer
                   path: ./artifacts
 
             - name: Download Windows portable
-              uses: actions/download-artifact@v7
+              uses: actions/download-artifact@v8
               with:
                   name: wonky-window-windows-portable
                   path: ./windows_portable
             - name: Zip Windows portable
               run: zip -r ./artifacts/WonkyWindow-windows-portable-v${{ inputs.tag }}.zip ./windows_portable
             - name: Download Linux build
-              uses: actions/download-artifact@v7
+              uses: actions/download-artifact@v8
               with:
                 name: wonky-window-linux
                 path: ./linux_build
