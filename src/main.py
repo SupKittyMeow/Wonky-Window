@@ -293,7 +293,7 @@ class Window(AcrylicWindow):
         self.blur_layout = QVBoxLayout()
         self.blur_layout.setContentsMargins(0, 0, 0, 30)
         self.blur = QComboBox()
-        self.blur.addItem("Translucent (Default)")
+        self.blur.addItem("Unblurred (Default)")
         self.blur.addItem("Blurred (WARNING: Can be laggy)")
         self.blur.addItem("Solid")
         
