@@ -109,7 +109,7 @@ jobs:
 
         - if: ${{ github.event_name != 'pull_request' }}
           name: Upload MacOS Artifact (DMG)
-          uses: actions/upload-artifact@v6
+          uses: actions/upload-artifact@v7
           with:
             name: wonky-window-macos
             path: "dist/WonkyWindow-macOS-v${{ steps.version.outputs.version }}.dmg"
@@ -175,7 +175,7 @@ jobs:
             Write-Host "---- dist contents ----"
             Get-ChildItem -Force dist
         - name: Upload Windows Artifact (Portable)
-          uses: actions/upload-artifact@v6
+          uses: actions/upload-artifact@v7
           with:
             name: wonky-window-windows-portable
             path: "dist/WonkyWindow-windows-portable-v${{ steps.version.outputs.version }}/*"
@@ -189,7 +189,7 @@ jobs:
             options: /DMyAppVersion=${{ steps.version.outputs.version }}
         - if: ${{ github.event_name != 'pull_request' }}
           name: Upload installer artifact
-          uses: actions/upload-artifact@v6
+          uses: actions/upload-artifact@v7
           with:
             name: wonky-window-windows-installer
             path: "output/WonkyWindow-windows-installer-v${{ steps.version.outputs.version }}.exe"
@@ -225,7 +225,7 @@ jobs:
           run: pyinstaller build_resources/main_linux.spec
         - if: ${{ github.event_name != 'pull_request' }}
           name: Upload Linux Artifact
-          uses: actions/upload-artifact@v6
+          uses: actions/upload-artifact@v7
           with:
             name: wonky-window-linux
             path: "dist/WonkyWindow-linux-v${{ steps.version.outputs.version }}*"
